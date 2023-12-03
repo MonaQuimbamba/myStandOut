@@ -1,4 +1,4 @@
-
+themes/poison
 # Created by https://www.gitignore.io/api/macos
 # Edit at https://www.gitignore.io/?templates=macos
 
@@ -36,3 +36,4 @@ Temporary Items
 
 # customize headers without touching git submodule.
 layouts/partials/extra-head.html
+
