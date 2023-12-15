@@ -8,10 +8,10 @@ pluralizelisttitles = false   # removes the automatically appended "s" on sideba
 # disqusShortname = "yourDisqusShortname"
 
 [params]
-    brand = "Poison"                      # name of your site - appears in the sidebar
+    brand = "Claudio-a"                      # name of your site - appears in the sidebar
     # remote_brand_image = 'https://github.com/USERNAME.png' # path to a remote file
     brand_image = "/images/profile.jpeg"    # path to the image shown in the sidebar
-    description = "Update this description..." # Used as default meta description if not specified in front matter
+    description = " mov [ebp+0x20], eax" # Used as default meta description if not specified in front matter
     dark_mode = true                      # optional - defaults to false
     # favicon = "favicon.png"             # path to favicon (defaults to favicon.png)
 
@@ -24,7 +24,7 @@ pluralizelisttitles = false   # removes the automatically appended "s" on sideba
         # HasChildren:  If the directory's files should be listed.  Default is true.
         # Limit:        If the files should be listed, how many should be shown.
     menu = [
-        {Name = "About", URL = "/about/", HasChildren = false},
+        {Name = "Whoami", URL = "/about/", HasChildren = false},
         {Name = "Posts", URL = "/posts/", Pre = "Recent", HasChildren = true, Limit = 5},
     ]
 

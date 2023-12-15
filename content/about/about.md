@@ -1,19 +1,18 @@
 ---
-title: "About"
+title: "Whoami"
 date: 2022-11-30T15:04:46-06:00
 draft: false
 ---
 
 ___
-*Words kill, words give life; they’re either **poison** or fruit—you choose.*
+*The greatest victory is that which requires no battle; the greatest defense is that which guards against all conflict*
 
-*--- Proverbs 18:21*
+*--- Sun Tzu's "The Art of War"*
 ___
 
-*Poison* is a **clean**, **professional** Hugo theme designed to **captivate** your readers.
+Hi there 👋
 
-It's also **tiny** and **privacy conscious** with *no external dependencies*.  That's right---no JavaScript frameworks, icon packs, or Google fonts.  No ads or trackers polluting your console window (try it out and take a look).  **We kept things simple**.  A little vanilla JavaScript, a dash of CSS, and the power of Hugo.
+I'm Claudio ANTONIO, cybersecurity researcher, SOC analyst and lover of CTF and bug hunting.
 
-All of the static assets for the site (JS files, CSS, and fonts) are located within the theme's */static/* directory.  **That way you know *exactly* what's going on your site**.
-
-To get started, I recommend reading through my introductory post [here]({{< ref "/posts/introducing-poison.md" >}}).  I use this theme on my personal site at https://lukeorth.com, so check it out if you want to see *Poison* in action.
+🔭 I'd like to share with you some of my experiences
+📫 Please don't hesitate to contact me if you have any questions or suggestions for collaboration:
