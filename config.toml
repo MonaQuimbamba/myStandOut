@@ -2,6 +2,7 @@ baseURL = "/"
 languageCode = "en-us"
 theme = "poison"
 paginate = 10
+disqusShortname = 'disqus_JFHo5P9s00'
 pluralizelisttitles = false   # removes the automatically appended "s" on sidebar entries
 
 # NOTE: If using Disqus as commenting engine, uncomment and configure this line
@@ -14,7 +15,7 @@ pluralizelisttitles = false   # removes the automatically appended "s" on sideba
     description = " mov [ebp+0x20], eax" # Used as default meta description if not specified in front matter
     dark_mode = true                      # optional - defaults to false
     # favicon = "favicon.png"             # path to favicon (defaults to favicon.png)
-
+    
     front_page_content = ["posts"] # Equivalent to the default value, add page bundle names to include them on the front page.
 
     # MENU PLACEHOLDER
