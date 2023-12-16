@@ -2,7 +2,7 @@ baseURL = "/"
 languageCode = "en-us"
 theme = "poison"
 paginate = 10
-disqusShortname = "disqus_JFHo5P9s00"
+disqusShortname = "http://disqus.com/by/disqus_JFHo5P9s00"
 pluralizelisttitles = false   # removes the automatically appended "s" on sidebar entries
 
 # NOTE: If using Disqus as commenting engine, uncomment and configure this line
