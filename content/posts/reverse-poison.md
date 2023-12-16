@@ -10,3 +10,21 @@ series: "Assembly"
 
 
 ### Table of contents
+
+### Tabs
+
+Some content is just better viewed in tabs.  There's a shortcode for that.
+
+{{< tabs tabTotal="2" >}}
+
+{{% tab tabName="First Tab" %}}
+This is **markdown** content.
+{{% /tab %}}
+
+{{< tab tabName="Second Tab" >}}
+{{< highlight text >}}
+This is a code block.
+{{</ highlight >}}
+{{< /tab >}}
+
+{{< /tabs >}}
