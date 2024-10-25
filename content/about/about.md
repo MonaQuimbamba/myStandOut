@@ -18,7 +18,7 @@ Absolutely, here’s an extended version with added cybersecurity-focused detail
 
 **Hi there 👋**
 
-I’m Charles, a passionate cybersecurity researcher focused on CTF challenges and malware hunting.
+I’m Claudio, a passionate cybersecurity researcher focused on CTF challenges and malware hunting.
 
 🔐 I work on uncovering vulnerabilities, analyzing malicious software, and developing strategies to strengthen security defenses. My projects range from threat detection to incident response, and I’m dedicated to staying ahead of the latest cyber threats and trends.
 
