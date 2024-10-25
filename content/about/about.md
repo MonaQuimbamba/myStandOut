@@ -12,10 +12,6 @@ _--- Sun Tzu's "The Art of War"_
 
 ---
 
-Absolutely, here’s an extended version with added cybersecurity-focused details:
-
----
-
 **Hi there 👋**
 
 I’m Claudio, a passionate cybersecurity researcher focused on CTF challenges and malware hunting.
