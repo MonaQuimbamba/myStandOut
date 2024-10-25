@@ -12,9 +12,16 @@ _--- Sun Tzu's "The Art of War"_
 
 ---
 
-Hi there 👋
+Absolutely, here’s an extended version with added cybersecurity-focused details:
 
-I'm Claudio ANTONIO, cybersecurity researcher, SOC analyst and lover of CTF and malware hunting.
+---
 
-🔭 I'd like to share with you some of my experiences
-📫 Please don't hesitate to contact me if you have any questions or suggestions for collaboration:
+**Hi there 👋**
+
+I’m Charles, a passionate cybersecurity researcher focused on CTF challenges and malware hunting.
+
+🔐 I work on uncovering vulnerabilities, analyzing malicious software, and developing strategies to strengthen security defenses. My projects range from threat detection to incident response, and I’m dedicated to staying ahead of the latest cyber threats and trends.
+
+🧰 I enjoy diving into digital forensics, reverse engineering, and network security analysis, always with an eye for innovation and collaboration.
+
+Let’s connect if you’re interested in cybersecurity insights, have questions, or want to discuss potential projects!
