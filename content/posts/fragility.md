@@ -5,8 +5,9 @@ draft: false
 image: brand_image.jpg
 tags: ["Wireshark", "Openssl"]
 series: "Hunting the hunter"
-reading: "8 min read"
 ---
+
+- Reading time : "8 min read"
 
 ## Context
 
