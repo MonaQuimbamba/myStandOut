@@ -51,7 +51,7 @@ Realizing the gravity of the situation, the team knew there was only one person 
 
 ---
 
-They called her, Mona, the cyber whiz known for her unparalleled skills in digital forensics and hacking. 🧠💻
+They called him/her/they, Mona, the cyber whiz known for her unparalleled skills in digital forensics and hacking. 🧠💻
 
 ---
 
