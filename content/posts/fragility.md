@@ -205,8 +205,6 @@ Apr 13 23:21:30 ubuntu gnome-shell[4904]: GNOME Shell started at Sat Apr 13 2024
 ---------------
 `````
 
-Here's an improved, formatted markdown version of your content:
-
 ---
 
 ## Further Investigation on `auth.log` File
