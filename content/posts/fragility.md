@@ -7,7 +7,7 @@ tags: ["Wireshark", "Openssl"]
 series: "Hunting the hunter"
 ---
 
-- Reading time : "8 min read"
+- Reading time : "16 min read"
 
 # GETI City Cyber Crisis
 
