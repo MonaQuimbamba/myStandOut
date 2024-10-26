@@ -9,63 +9,106 @@ series: "Hunting the hunter"
 
 - Reading time : "8 min read"
 
-## Context
+# GETI City Cyber Crisis
 
->
-
----
-
-It was a long, cold night in GETI City, one of the largest cities in Golang Country. The winter wind howled through the skyscrapers...
+## Episode 1: The Breach
 
 ---
 
-**Everything was going smoothly until a sudden alert flashed on the SOC team's screen at Brukley Company.**
+> _In the heart of Golang Country stands GETI City - a metropolis where technology and ambition touch the sky..._
 
 ---
 
-Inside the Brukley Company's SOC room, screens flashed red with alerts. John, a SOC analyst, was frantically typing on his keyboard.
+### Scene 1: The City
+
+The winter wind howls through GETI City's glass-and-steel canyons, carrying whispers of digital secrets between towering skyscrapers. Neon signs pierce the darkness, their glow reflecting off the frost-covered windows of Brukley Company's cybersecurity headquarters.
 
 ---
 
-**John:** "Guys, something's wrong. A critical file on my machine just vanished! 📁❌"
+### Scene 2: The Alert
+
+```
+[CRITICAL ALERT]
+Time: 23:47
+Location: Brukley Company SOC
+Status: ⚠️ SECURITY BREACH DETECTED ⚠️
+```
 
 ---
 
-The team huddled around John's screen, eyes wide with concern.
+### Scene 3: The SOC Room
+
+_The Security Operations Center thrums with tension. Rows of monitors cast an eerie blue glow across worried faces. In the corner, John's workspace has become the epicenter of chaos._
+
+**John** [hands trembling over keyboard]:  
+"This isn't normal... The file just... disappeared. Like it was never there."
+
+**Team** [gathering around]:  
+_The soft whir of cooling fans is the only sound as they watch John's screen in horrified silence._
 
 ---
 
-**Thomas:** "Hey! There's a new account listed on the login screen. We might be under attack. 🚨👤"
+### Scene 4: The Discovery
+
+**Thomas** [leaning forward, squinting]:  
+"Wait. That account... it wasn't there five minutes ago."  
+_His finger traces across the screen, pointing to a username that shouldn't exist._
+
+**John**:  
+"How did we miss this?"
 
 ---
 
-**Marcos, the SOC team leader:** "We need all the evidence. Start collecting data from John’s computer. Get a network capture immediately. We need to figure out what happened here. 🕵️‍♂️💻"
+### Scene 5: The Response
+
+**Marcos** [commanding presence, SOC team leader]:  
+"Listen up! I want:
+
+- Full network captures
+- System logs from the last 48 hours
+- Memory dumps from John's machine
+- All access logs from the authentication servers
+
+We're not losing this trail."
 
 ---
 
-The team collected evidence, showing scenes of USB drives, network cables, and screens filled with code and logs.
+### Scene 6: The Investigation
+
+_Montage sequence:_
+
+- Screens fill with scrolling logs
+- USB drives blink frantically
+- Network cables snake across desks
+- Commands fly across terminals
+- Coffee cups multiply
 
 ---
 
-Realizing the gravity of the situation, the team knew there was only one person who could help...
+### Scene 7: The Call for Help
+
+_The team exchanges knowing looks. There's only one person who can unravel this digital nightmare..._
 
 ---
 
-They called him/her/they, Mona, the cyber whiz known for her unparalleled skills in digital forensics and hacking. 🧠💻
+### Scene 8: Enter Mona
+
+_The SOC room door hisses open. A figure stands in the doorway, silhouetted against the hallway lights. Her custom-built laptop glows with a soft, dangerous light._
+
+**Mona** [stepping into the light]:  
+"Show me what you've got. And someone better have decent coffee."
+
+_Her fingers hover over her keyboard like a pianist about to begin a symphony of code._
 
 ---
 
-Mona entered the office, wearing a long coat and holding a laptop. 🧥💼
+> _To be continued..._
 
----
+## The Network Capture Investigation
 
-**Mona:** "Alright team, let's crack this case wide open. 🔓🕵️‍♀️"
+The team provided to mona a `.cap` file containing 1,427 packets.
 
----
-
-## Network Capture Investigation
-
-The team provided a `.cap` file containing 1,427 packets. We began by filtering for HTTP/HTTPS traffic to identify any abnormal activity during the connection to the Splunk web UI. After applying the HTTP filter, we narrowed the traffic down to 30 packets out of the total 1,427, focusing our analysis on these to look for potential security anomalies or unauthorized access patterns.
+Mona was using a network traffic tools wireshark he began by filtering for HTTP/HTTPS traffic to identify any abnormal activity on the network then he find out something wierd during the connection to the Splunk web UI. After applying the HTTP filter, he narrowed the traffic down to 30 packets out of the total 1,427, focusing the analysis on these to look for potential security anomalies or unauthorized access patterns. sudden he find some thing wierd that may be related to the splunk CVE-2023-46214
 
 ---
 
