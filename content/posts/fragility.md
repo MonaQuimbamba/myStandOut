@@ -11,7 +11,57 @@ series: "Hunting the hunter"
 
 ## Context
 
-> **In the monitoring team at our company, each member has access to the Splunk web UI through an admin-level Splunk account. Among these users, John has full control over the machine that hosts the entire Splunk system. Recently, he reported an issue: a critical file on his computer had vanished. Furthermore, he noticed a new account listed on the login screen. Suspecting a potential attack, we collected evidence from his computer and acquired a network capture for further analysis. Can you help us investigate it?**
+>
+
+---
+
+It was a long, cold night in GETI City, one of the largest cities in Golang Country. The winter wind howled through the skyscrapers...
+
+---
+
+**Everything was going smoothly until a sudden alert flashed on the SOC team's screen at Brukley Company.**
+
+---
+
+Inside the Brukley Company's SOC room, screens flashed red with alerts. John, a SOC analyst, was frantically typing on his keyboard.
+
+---
+
+**John:** "Guys, something's wrong. A critical file on my machine just vanished! 📁❌"
+
+---
+
+The team huddled around John's screen, eyes wide with concern.
+
+---
+
+**Thomas:** "Hey! There's a new account listed on the login screen. We might be under attack. 🚨👤"
+
+---
+
+**Marcos, the SOC team leader:** "We need all the evidence. Start collecting data from John’s computer. Get a network capture immediately. We need to figure out what happened here. 🕵️‍♂️💻"
+
+---
+
+The team collected evidence, showing scenes of USB drives, network cables, and screens filled with code and logs.
+
+---
+
+Realizing the gravity of the situation, the team knew there was only one person who could help...
+
+---
+
+They called her, Mona, the cyber whiz known for her unparalleled skills in digital forensics and hacking. 🧠💻
+
+---
+
+Mona entered the office, wearing a long coat and holding a laptop. 🧥💼
+
+---
+
+**Mona:** "Alright team, let's crack this case wide open. 🔓🕵️‍♀️"
+
+---
 
 ## Network Capture Investigation
 
