@@ -3,7 +3,7 @@ title: "Incident Response"
 date: 2024-10-25T13:43:53-06:00
 draft: false
 image: brand_image.jpg
-tags: ["Wireshark", "Splunk"]
+tags: ["Wireshark", "Openssl"]
 series: "Hunting the hunter"
 reading: "8 min read"
 ---
