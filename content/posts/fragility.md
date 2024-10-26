@@ -373,7 +373,7 @@ Apr 13 23:21:30 ubuntu gnome-shell[4904]: GNOME Shell started at Sat Apr 13 2024
 grep -i "timezone" var/log/syslog
 ```
 
-The output confirms the timezone change:
+The output confirms the timezone was changed:
 
 ```bash
 Apr 13 23:24:56 ubuntu dbus-daemon[638]: [system] Activating via systemd: service name='org.freedesktop.timedate1' unit='dbus-org.freedesktop.timedate1.service' requested by ':1.113' (uid=0 pid=5827 comm="timedatectl set-timezone Asia/Ho_Chi_Minh " label="unconfined")
@@ -424,7 +424,7 @@ _She activates her tracking algorithm._
 
 ### Scene 1: The Log Analysis
 
-_Mona's workspace is filled with terminal windows displaying auth.log entries. The soft glow of the screens illuminates her focused expression._
+_Mona's workspace is filled with terminal windows displaying /var/log/auth.log entries. The soft glow of the screens illuminates her focused expression._
 
 **Mona** [scanning through logs]:  
 "Three minutes. They were in and out in just three minutes."
@@ -432,8 +432,47 @@ _Mona's workspace is filled with terminal windows displaying auth.log entries. T
 _She highlights a timestamp sequence:_
 
 ```
-08:00:13 - User Created
-08:03:08 - Session Terminated
+Apr 14 08:00:13 ubuntu groupadd[13358]: group added to /etc/group: name=nginx, GID=1002
+Apr 14 08:00:13 ubuntu groupadd[13358]: group added to /etc/gshadow: name=nginx
+Apr 14 08:00:13 ubuntu groupadd[13358]: new group: name=nginx, GID=1002
+Apr 14 08:00:13 ubuntu useradd[13364]: new user: name=nginx, UID=1002, GID=1002, home=/var/www/, shell=/bin/bash, from=none
+Apr 14 08:00:13 ubuntu usermod[13376]: change user 'nginx' password
+Apr 14 08:00:13 ubuntu chfn[13383]: changed user 'nginx' information
+Apr 14 08:00:13 ubuntu chpasswd[13394]: pam_unix(chpasswd:chauthtok): password changed for nginx
+Apr 14 08:00:13 ubuntu chpasswd[13394]: gkr-pam: couldn't update the login keyring password: no old password was entered
+Apr 14 08:00:13 ubuntu usermod[13397]: add 'nginx' to group 'sudo'
+Apr 14 08:00:13 ubuntu usermod[13397]: add 'nginx' to shadow group 'sudo'
+Apr 14 08:00:21 ubuntu sshd[13461]: Accepted publickey for nginx from 192.168.222.130 port 43302 ssh2: RSA SHA256:zRdVnxnRPJ37HDm5KkRvQbklvc2PfFL3av8W1Jb6QoE
+Apr 14 08:00:21 ubuntu sshd[13461]: pam_unix(sshd:session): session opened for user nginx by (uid=0)
+Apr 14 08:00:21 ubuntu systemd-logind[673]: New session 7 of user nginx.
+Apr 14 08:00:22 ubuntu systemd: pam_unix(systemd-user:session): session opened for user nginx by (uid=0)
+Apr 14 08:00:45 ubuntu sudo: pam_unix(sudo:auth): Couldn't open /etc/securetty: No such file or directory
+Apr 14 08:00:54 ubuntu sudo: pam_unix(sudo:auth): Couldn't open /etc/securetty: No such file or directory
+Apr 14 08:00:54 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/opt/splunk/bin/scripts ; USER=root ; COMMAND=/usr/bin/rm -rf search.sh
+Apr 14 08:00:54 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
+Apr 14 08:00:54 ubuntu sudo: pam_unix(sudo:session): session closed for user root
+Apr 14 08:00:59 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/opt/splunk/bin/scripts ; USER=root ; COMMAND=/usr/bin/su
+Apr 14 08:00:59 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
+Apr 14 08:00:59 ubuntu su: (to root) nginx on pts/2
+Apr 14 08:00:59 ubuntu su: pam_unix(su:session): session opened for user root by nginx(uid=0)
+Apr 14 08:01:37 ubuntu pkexec: pam_unix(polkit-1:session): session opened for user root by (uid=1000)
+Apr 14 08:01:37 ubuntu pkexec[14219]: johnnycage: Executing command [USER=root] [TTY=unknown] [CWD=/home/johnnycage] [COMMAND=/usr/lib/update-notifier/package-system-locked]
+Apr 14 08:01:44 ubuntu su: pam_unix(su:session): session closed for user root
+Apr 14 08:01:44 ubuntu sudo: pam_unix(sudo:session): session closed for user root
+Apr 14 08:02:21 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/mv /home/johnnycage/Documents/Important.pdf .
+Apr 14 08:02:21 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
+Apr 14 08:02:21 ubuntu sudo: pam_unix(sudo:session): session closed for user root
+Apr 14 08:02:54 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/openssl enc -aes-256-cbc -iv 4fa17640b7dfe8799f072c65b15f581d -K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d -in data.zip
+Apr 14 08:02:54 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
+Apr 14 08:02:54 ubuntu sudo: pam_unix(sudo:session): session closed for user root
+Apr 14 08:03:01 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/rm -rf data.zip Important.pdf
+Apr 14 08:03:01 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
+Apr 14 08:03:01 ubuntu sudo: pam_unix(sudo:session): session closed for user root
+Apr 14 08:03:08 ubuntu sshd[13702]: Received disconnect from 192.168.222.130 port 43302:11: disconnected by user
+Apr 14 08:03:08 ubuntu sshd[13702]: Disconnected from user nginx 192.168.222.130 port 43302
+Apr 14 08:03:08 ubuntu sshd[13461]: pam_unix(sshd:session): session closed for user nginx
+Apr 14 08:03:08 ubuntu systemd-logind[673]: Session 7 logged out. Waiting for processes to exit.
+Apr 14 08:03:08 ubuntu systemd-logind[673]: Removed session 7.
 ```
 
 **Thomas**:  
@@ -450,14 +489,89 @@ _Multiple screens show the attacker's activities timeline. Mona pieces together 
 
 _She brings up key log entries:_
 
-```
-08:00:21 - SSH Connection Established
-08:00:54 - First Command Execution
-08:00:59 - Root Access Obtained
-```
+#### Time Elapsed Between Actions
+
+To calculate the time between the user’s creation and the end of the session:
+
+- **User `nginx` Created**: April 14, 08:00:13
+- **SSH Session Ended**: April 14, 08:03:08
+- **Elapsed Time**: **00:02:55**
+
+Below is a breakdown of key log entries to understand the attacker’s actions:
+
+1. **`Apr 14 08:00:59 ubuntu su: (to root) nginx on pts/2`**
+   - **Timestamp**: April 14, 08:00:59
+   - **Event**: The user `nginx` is attempting to switch to the `root` user using the `su` command on the terminal session `pts/2`.
+   - **Significance**: This indicates that the `nginx` user is trying to gain superuser privileges.
+2. **`Apr 14 08:00:59 ubuntu su: pam_unix(su:session): session opened for user root by nginx(uid=0)`**
+   - **Event**: A new session has been opened for the `root` user by `nginx`.
+   - **Significance**: The attempt to switch to the `root` user was successful. The UID of `nginx` is 0, which typically indicates that the user has administrative privileges.
+3. **`Apr 14 08:01:37 ubuntu pkexec: pam_unix(polkit-1:session): session opened for user root by (uid=1000)`**
+   - **Timestamp**: April 14, 08:01:37
+   - **Event**: A session has been opened for the `root` user by a user with UID 1000 (most likely a non-root user).
+   - **Significance**: This indicates that a user (likely `johnnycage`, based on the next line) executed a command that required elevated privileges using `pkexec`.
+4. **`Apr 14 08:01:37 ubuntu pkexec[14219]: johnnycage: Executing command [USER=root] [TTY=unknown] [CWD=/home/johnnycage] [COMMAND=/usr/lib/update-notifier/package-system-locked]`**
+   - **Event**: The user `johnnycage` executed a command to run the `package-system-locked` script.
+   - **Significance**: This indicates that `johnnycage` was trying to perform an action that required root permissions, possibly to notify about package updates.
+5. **`Apr 14 08:01:44 ubuntu su: pam_unix(su:session): session closed for user root`**
+   - **Event**: The session for the `root` user has been closed.
+   - **Significance**: The `nginx` user has finished the session as `root`.
+6. **`Apr 14 08:01:44 ubuntu sudo: pam_unix(sudo:session): session closed for user root`**
+   - **Event**: Another session for the `root` user, initiated by `sudo`, has been closed.
+   - **Significance**: This confirms that the `root` session associated with `sudo` has also ended.
+7. **`Apr 14 08:02:21 ubuntu sudo: nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/mv /home/johnnycage/Documents/Important.pdf .`**
+   - **Timestamp**: April 14, 08:02:21
+   - **Event**: The `nginx` user is moving a file named `Important.pdf` from `johnnycage`'s Documents folder to the current directory (`/var/www`).
+   - **Significance**: This operation indicates file management, possibly for a web application.
+8. **`Apr 14 08:02:21 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)`**
+   - **Event**: A new session has been opened for the `root` user by `nginx` through `sudo`.
+   - **Significance**: The `nginx` user has elevated permissions again.
+9. **`Apr 14 08:02:21 ubuntu sudo: pam_unix(sudo:session): session closed for user root`**
+   - **Event**: The session for the `root` user has been closed.
+   - **Significance**: Indicates that the operation initiated by `nginx` has been completed.
+10. **`Apr 14 08:02:54 ubuntu sudo: nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/openssl enc -aes-256-cbc -iv 4fa17640b7dfe8799f072c65b15f581d -K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d -in data.zip`**
+    - **Timestamp**: April 14, 08:02:54
+    - **Event**: The `nginx` user is using `openssl` to encrypt a file (`data.zip`) with AES-256-CBC.
+    - **Significance**: This operation suggests that the `nginx` user is encrypting sensitive data.
+11. **`Apr 14 08:02:54 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)`**
+    - **Event**: A new session has been opened for the `root` user by `nginx` for this command.
+    - **Significance**: Indicates that `nginx` is performing operations with root privileges again.
+12. **`Apr 14 08:02:54 ubuntu sudo: pam_unix(sudo:session): session closed for user root`**
+    - **Event**: The session for the `root` user has been closed.
+    - **Significance**: This indicates the completion of the encryption command.
+13. **`Apr 14 08:03:01 ubuntu sudo: nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/rm -rf data.zip Important.pdf`**
+    - **Timestamp**: April 14, 08:03:01
+    - **Event**: The `nginx` user is removing the original `data.zip` and `Important.pdf` files.
+    - **Significance**: This suggests an attempt to cover tracks or remove sensitive files after processing.
 
 **Marcos**:  
 "They knew exactly what they were after."
+
+**Mona**: "we can trace when the attacker connected via SSH. To do this, we examine log entries related to the `sshd` service"
+
+```bash
+cat auth.log | grep -i "sshd"
+```
+
+**Sample Output**:
+
+```plaintext
+Apr 14 07:58:34 ubuntu useradd[11091]: new user: name=sshd, UID=126, GID=65534, home=/run/sshd, shell=/usr/sbin/nologin, from=none
+Apr 14 07:58:34 ubuntu usermod[11099]: change user 'sshd' password
+Apr 14 07:58:34 ubuntu chage[11106]: changed password expiry for sshd
+Apr 14 08:00:21 ubuntu sshd[13461]: Accepted publickey for nginx from 192.168.222.130 port 43302 ssh2: RSA SHA256:zRdVnxnRPJ37HDm5KkRvQbklvc2PfFL3av8W1Jb6QoE
+Apr 14 08:00:21 ubuntu sshd[13461]: pam_unix(sshd:session): session opened for user nginx by (uid=0)
+Apr 14 08:03:08 ubuntu sshd[13702]: Received disconnect from 192.168.222.130 port 43302:11: disconnected by user
+```
+
+Knowing the timezone, we can convert connection timestamps to UTC.
+
+### Connection Timestamps
+
+- **Original Date and Time**: April 14, 2024, at 08:00:21 PDT
+- **Converted to UTC**: April 14, 2024, at 15:00:21 UTC
+  The final timestamp in `MM-DD hh:mm:ss` format is:
+  **`04-14 15:00:21`**
 
 ---
 
