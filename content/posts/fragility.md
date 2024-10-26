@@ -230,7 +230,7 @@ username=johnnyC&password=h3Re15j0hnNy&set_has_logged_in=false
 
 #### Step 2: Upload Malicious XSL File
 
-After login, the attacker uploads a malicious XSL file, the main payload for this exploit:
+After login, the attacker uploads a malicious `XSL file`, the main payload for this exploit:
 
 ```bash
 POST /en-US/splunkd/__upload/indexing/preview?output_mode=json&props.NO_BINARY_CHECK=1&input.path=search.xsl HTTP/1.1
@@ -291,7 +291,7 @@ POST /en-US/splunkd/__raw/servicesNS/johnnyC/search/search/jobs?output_mode=json
 
 This ultimately allows the attacker to execute arbitrary code and escalate privileges.
 
-This vulnerability has the relevant MITRE ATT&CK Techniques for Maintaining Persistence
+This vulnerability has the relevant `MITRE ATT&CK` Techniques for Maintaining Persistence
 
 ##### 1. **Create Account (T1136)**
 
@@ -353,14 +353,14 @@ _The investigation room is quiet except for the soft hum of servers. Multiple sc
 
 ### Scene 2: The Discovery
 
-_Monaquimbamba pulls up the root/var/log/syslog entries on the main screen, the text reflecting off her glasses._
+_Monaquimbamba pulls up the `root/var/log/syslog` entries on the main screen, the text reflecting off her glasses._
 
 **Monaquimbamba**:  
 "Look at this. The system was originally in Pacific time..."
 
 _She highlights a log entry:_
 
-```
+```bash
 Apr 13 23:21:30 ubuntu gnome-shell[4904]: GNOME Shell started at Sat Apr 13 2024 23:21:22 GMT-0700 (PDT)
 ```
 
@@ -424,16 +424,15 @@ _She activates her tracking algorithm._
 
 ### Scene 1: The Log Analysis
 
-_Monaquimbamba's workspace is filled with terminal windows displaying /var/log/auth.log entries. The soft glow of the screens illuminates her focused expression._
+_Monaquimbamba's workspace is filled with terminal windows displaying `/var/log/auth.log` entries. The soft glow of the screens illuminates her focused expression._
 
 **Monaquimbamba** [scanning through logs]:  
 "Three minutes. They were in and out in just three minutes."
 
 _She highlights a timestamp sequence:_
 
-````dotnetcli
-
-- Apr 14 08:00:13 ubuntu groupadd[13358]: group added to /etc/group: name=nginx, GID=1002
+```bash
+++Apr 14 08:00:13 ubuntu groupadd[13358]: group added to /etc/group: name=nginx, GID=1002
   Apr 14 08:00:13 ubuntu groupadd[13358]: group added to /etc/gshadow: name=nginx
   Apr 14 08:00:13 ubuntu groupadd[13358]: new group: name=nginx, GID=1002
   Apr 14 08:00:13 ubuntu useradd[13364]: new user: name=nginx, UID=1002, GID=1002, home=/var/www/, shell=/bin/bash, from=none
@@ -473,9 +472,8 @@ _She highlights a timestamp sequence:_
   Apr 14 08:03:08 ubuntu sshd[13702]: Disconnected from user nginx 192.168.222.130 port 43302
   Apr 14 08:03:08 ubuntu sshd[13461]: pam_unix(sshd:session): session closed for user nginx
   Apr 14 08:03:08 ubuntu systemd-logind[673]: Session 7 logged out. Waiting for processes to exit.
-
-- Apr 14 08:03:08 ubuntu systemd-logind[673]: Removed session 7.
-``
+++Apr 14 08:03:08 ubuntu systemd-logind[673]: Removed session 7.
+```
 
 **Thomas**:
 "That's surgical precision."
@@ -553,11 +551,11 @@ Below is a breakdown of key log entries to understand the attacker’s actions:
 
 ```bash
 cat auth.log | grep -i "sshd"
-````
+```
 
 **Sample Output**:
 
-```plaintext
+```bash
 Apr 14 07:58:34 ubuntu useradd[11091]: new user: name=sshd, UID=126, GID=65534, home=/run/sshd, shell=/usr/sbin/nologin, from=none
 Apr 14 07:58:34 ubuntu usermod[11099]: change user 'sshd' password
 Apr 14 07:58:34 ubuntu chage[11106]: changed password expiry for sshd
@@ -623,7 +621,7 @@ sudo openssl enc -aes-256-cbc \
 "They went straight for johnnycage's documents. Just like we saw in the logs."
 
 **John**:  
-"They encrypted something called 'data.zip'..."
+"They encrypted something called `data.zip`..."
 
 **Monaquimbamba** :
 "From the `.bash_history` and `auth.log`, we observe that the attacker:"
@@ -646,10 +644,10 @@ iv 4fa17640b7dfe8799f072c65b15f581d
 _A network diagram appears, showing the data's path._
 
 **Monaquimbamba**:  
-"The final destination: 192.168.222.130, port 8080."
+"The final destination: `192.168.222.130`, port `8080`."
 
 **Thomas**:  
-"And they encoded it three times - encryption, base64, and EBCDIC."
+"And they encoded it three times - encryption, `base64`, and `EBCDIC`."
 
 **Monaquimbamba**:  
 "Like nesting dolls of obfuscation."
@@ -657,7 +655,7 @@ _A network diagram appears, showing the data's path._
 **Marcos**:  
 "A perfectly choreographed attack."
 
-**Monaquimbamba**: "Let put this all together"
+**Monaquimbamba**: "Let's put this all together"
 
 The following command line demonstrates a multi-step operation using several tools—`openssl`, `cut`, `uname`, `md5sum`, `sha256sum`, `date`, `base64`, and `dd`. Here’s a detailed breakdown:
 
@@ -710,7 +708,7 @@ _Monaquimbamba zooms in on the connection details._
 
 _She brings up the SSH connection log:_
 
-```
+```bash
 Accepted publickey for nginx from 192.168.222.130 port 43302
 ```
 
@@ -726,7 +724,7 @@ Accepted publickey for nginx from 192.168.222.130 port 43302
 _Thomas pulls up network traffic logs._
 
 **Thomas**:  
-"Got the EBCDIC-encoded transmission. Port 8080, just like in the command."
+"Got the `EBCDIC-encoded` transmission. Port `8080`, just like in the command."
 
 **Monaquimbamba**:  
 "Now we reverse their Russian doll encryption..."
@@ -770,7 +768,7 @@ def extract_tcp_data(pcap_file):
 
 #### Step 2: Convert from EBCDIC to ASCII
 
-Using IBM's EBCDIC encoding (`cp037`), convert the raw data to ASCII format.
+Using IBM's `EBCDIC` encoding (`cp037`), convert the raw data to `ASCII` format.
 
 ```python
 import codecs
@@ -780,7 +778,7 @@ ascii_data = codecs.decode(assembled_data, 'cp037')
 
 #### Step 3: Decode Base64 Data
 
-Next, decode the ASCII data from Base64.
+Next, decode the `ASCII` data from `Base64`.
 
 ```python
 import base64
@@ -829,7 +827,7 @@ _The team has set up a specialized workstation for data recovery. Multiple serve
 
 _She displays the known parameters:_
 
-```plaintext
+```bash
 IV: 4fa17640b7dfe8799f072c65b15f581d
 Key: 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
 ```
@@ -841,11 +839,11 @@ Key: 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
 _Monaquimbamba's fingers fly across the keyboard as she runs the reverse process._
 
 **Monaquimbamba**:  
-"First, convert from EBCDIC back to ASCII then decode to Base64 and we will have a .zip"
+"First, convert from `EBCDIC` back to `ASCII` then decode to `Base64` and we will have a `.zip`"
 
 _She types commands:_
 
-```
+```bash
 Analyzing 1427 packets from capture.pcapng...
 Extracted 103813 bytes of raw data
 Converted EBCDIC to ASCII
@@ -900,6 +898,6 @@ _Her screen fills with hexadecimal values._
 "Let's see"
 
 **John**:  
-"This is my file they have it "
+"Is this my file!! do they have it , now ???"
 
 ![Alt text](/images/file_fragility.png "Optional Title")
