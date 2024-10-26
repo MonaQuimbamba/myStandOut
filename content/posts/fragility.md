@@ -5,6 +5,7 @@ draft: false
 image: brand_image.jpg
 tags: ["Wireshark", "Splunk"]
 series: "Hunting the hunter"
+reading: "8 min read"
 ---
 
 ## Context
