@@ -334,7 +334,7 @@ _The team clusters around Mona's workspace, the tension palpable._
 
 ---
 
-## Episode 4: The Time Paradox
+## Episode 3: The Time Paradox
 
 ### Scene 1: The Timeline Puzzle
 
@@ -353,7 +353,7 @@ _The investigation room is quiet except for the soft hum of servers. Multiple sc
 
 ### Scene 2: The Discovery
 
-_Mona pulls up the syslog entries on the main screen, the text reflecting off her glasses._
+_Mona pulls up the root/var/log/syslog entries on the main screen, the text reflecting off her glasses._
 
 **Mona**:  
 "Look at this. The system was originally in Pacific time..."
@@ -366,6 +366,18 @@ Apr 13 23:21:30 ubuntu gnome-shell[4904]: GNOME Shell started at Sat Apr 13 2024
 
 **John** [shifting uncomfortably]:  
 "I had to adjust the timezone for better synchronization with the target systems."
+
+**Mona**: "What about this one"
+
+```bash
+grep -i "timezone" var/log/syslog
+```
+
+The output confirms the timezone change:
+
+```bash
+Apr 13 23:24:56 ubuntu dbus-daemon[638]: [system] Activating via systemd: service name='org.freedesktop.timedate1' unit='dbus-org.freedesktop.timedate1.service' requested by ':1.113' (uid=0 pid=5827 comm="timedatectl set-timezone Asia/Ho_Chi_Minh " label="unconfined")
+```
 
 ---
 
@@ -381,40 +393,7 @@ _The team examines a complex timeline of events displayed across multiple monito
 
 ---
 
-### Scene 4: The System Analysis
-
-_Mona navigates through the directory structure on one screen while maintaining the attack timeline on another._
-
-**Mona** [pointing at the directory tree]:  
-"They knew the system inside and out. Look at how they navigated:"
-
-```
-root/
-├── var/
-│   ├── log/
-│   └── syslog
-```
-
-**Thomas**:  
-"They used the system's own complexity against us."
-
----
-
-### Scene 5: The Connection
-
-_Mona suddenly straightens in her chair, her eyes widening._
-
-**Mona**:  
-"The nginx user we found in Episode 3... check when it was created."
-
-_She rapidly types commands, bringing up user creation logs._
-
-**Thomas** [leaning forward]:  
-"The timestamps are scrambled between the zones!"
-
----
-
-### Scene 6: The Pattern Emerges
+### Scene 4: The Pattern Emerges
 
 _A visualization appears showing two parallel timelines - one in PDT, one in Asia/Ho_Chi_Minh._
 
@@ -429,45 +408,7 @@ _A visualization appears showing two parallel timelines - one in PDT, one in Asi
 
 ---
 
-### Scene 7: The Breakthrough
-
-_Mona begins mapping the attack timeline against the timezone change._
-
-**Mona**:  
-"The XSL payload from before... it wasn't just about system access. They needed the timezone confusion to mask their real movements."
-
-_She brings up the decoded base64 string from Episode 3:_
-
-```
-f8287ec2-3f9a-4a39-9076-36546ebb6a93
-```
-
-**Mona**:  
-"This signature... it's timestamped in both zones. They're taunting us."
-
----
-
-### Scene 8: The Next Move
-
-_The team stands around a whiteboard filled with timestamps and attack vectors._
-
-**John**:  
-"So what's our next step?"
-
-**Mona** [with determination]:  
-"We use their temporal game against them. Every system call, every log entry, every timestamp has to be normalized."
-
-_She starts writing a script:_
-
-```python
-def normalize_timestamps(timezone_original, timezone_new):
-    # Convert all timestamps to UTC
-    # Then reconstruct the attack timeline
-```
-
----
-
-### Scene 9: The Hunt Continues
+### Scene 5: The Hunt Continues
 
 _The room glows with the light of dozens of screens, each showing different aspects of the investigation._
 
