@@ -291,12 +291,29 @@ POST /en-US/splunkd/__raw/servicesNS/johnnyC/search/search/jobs?output_mode=json
 
 This ultimately allows the attacker to execute arbitrary code and escalate privileges.
 
+This vulnerability has the relevant MITRE ATT&CK Techniques for Maintaining Persistence
+
+##### 1. **Create Account (T1136)**
+
+- **Description**: This technique involves an attacker creating a new user account on a compromised system.
+- **Example**: An attacker could exploit the vulnerability to create a new account with administrative privileges, granting them ongoing access. This is often achieved via commands that add users with elevated permissions.
+
+##### 2. **SSH Hijacking (T1203)**
+
+- **Description**: By adding an SSH public key to the authorized keys of an existing or newly created user, an attacker can enable remote access without needing a password.
+- **Example**: An attacker may inject a script to add their SSH key to a user’s `.ssh/authorized_keys` file, allowing them to maintain remote access independently of the original method of entry.
+
+##### 3. **Account Manipulation (T1098)**
+
+- **Description**: This technique involves modifying account permissions or configurations to retain access.
+- **Example**: An attacker might modify an existing account by adding it to the `sudo` group or altering password settings to ensure persistent access.
+
 ### Scene 8: The Confirmation
 
 _Mona swivels in her chair to face the team._
 
 **Mona**:  
-"We're dealing with someone who knows their CVEs. They exploited a vulnerability that was just published. But they made one mistake..."
+"We're dealing with someone who knows their CVEs. They exploited a vulnerability that was just published [Uptycs Blog](https://www.uptycs.com/blog/threat-research-report-team/splunk-vulnerability-cve-2023-46214). But they made one mistake..."
 
 _She turns back to her screen, a slight smile playing at the corner of her mouth._
 
@@ -316,163 +333,6 @@ _The team clusters around Mona's workspace, the tension palpable._
 "Now? We follow the trail. And I know exactly where it leads..."
 
 ---
-
-_Technical Notes:_
-
-- CVE-2023-46214 refers to a critical vulnerability in Splunk Enterprise
-- The attack pattern shows sophisticated knowledge of Splunk's web interface
-- Network capture analysis reveals precise timing of the initial breach
-
----
-
-## Episode 3: The Exploit Chain
-
----
-
-### Scene 1: The Deep Dive
-
-_Mona's workspace is illuminated by multiple screens, each showing different aspects of the attack. The room is dark except for the blue glow of monitors._
-
-**Mona** [eyes fixed on the central screen]:  
-"There you are... I can see your footprints now."
-
----
-
-### Scene 2: The HTTP Dance
-
-_A terminal window shows scrolling HTTP requests. Mona's fingers tap rhythmically on her desk._
-
-```
-[NETWORK TIMELINE]
-23:15:47 - POST /en-US/account/login
-23:15:52 - Authentication successful
-23:16:03 - POST /en-US/splunkd/__upload
-```
-
-**John** [leaning in]:  
-"What are we looking at?"
-
-**Mona**:  
-"The attacker's opening moves. Like a chess game, every piece has its purpose."
-
----
-
-### Scene 3: The Revelation
-
-_Mona pulls up a split screen showing the malicious payload._
-
-**Mona**:  
-"Look at this. They used an XSL file as their weapon of choice. Elegant... and deadly."
-
-```
-[MALICIOUS PAYLOAD DETECTED]
-Type: XSL Transform
-Target: Splunk Enterprise
-Severity: Critical
-Intent: Remote Code Execution
-```
-
----
-
-### Scene 4: Breaking It Down
-
-_The team gathers around as Mona dissects the attack._
-
-**Mona** [pointing at different sections of code]:  
-"Three-step attack chain:
-
-1. Login with stolen credentials
-2. Upload weaponized XSL file
-3. Trigger the payload"
-
-**Marcos**:  
-"But what was their endgame?"
-
----
-
-### Scene 5: The Master Plan
-
-_Mona's screen fills with decoded commands._
-
-**Mona** [grimly]:  
-"They weren't just breaking in... they were moving in."
-
-_She highlights key portions of the decoded payload:_
-
-```
-[ATTACKER'S ACTIONS]
-✓ Create backdoor user
-✓ Grant admin privileges
-✓ Plant SSH key
-✓ Cover tracks
-```
-
----
-
-### Scene 6: The Pieces Fall Into Place
-
-_Thomas jumps from his chair, recognition dawning on his face._
-
-**Thomas**:  
-"The new account I spotted... it wasn't random!"
-
-**Mona** [nodding]:  
-"They created a ghost in our machine. A user named 'nginx' hidden in plain sight."
-
----
-
-### Scene 7: The Tradecraft
-
-_Mona brings up a tactical analysis screen._
-
-**Mona**:  
-"This is professional work. They're using techniques straight from the MITRE ATT&CK framework:
-
-- Account Creation
-- SSH Hijacking
-- Privilege Escalation"
-
----
-
-### Scene 8: The Smoking Gun
-
-_A decoded base64 string appears on screen._
-
-**Mona** [triumphant]:  
-"And here's their mistake. The password they used..."
-
-_She runs a quick decode command:_
-
-```
-f8287ec2-3f9a-4a39-9076-36546ebb6a93
-```
-
-**Mona**:  
-"This isn't random. It's a signature."
-
----
-
-### Scene 9: The Trail Heats Up
-
-_The team looks at each other as the implications sink in._
-
-**Marcos**:  
-"You know who did this?"
-
-**Mona** [closing her laptop]:  
-"Better. I know where they're going next. And this time..."
-_She pulls out a small device from her coat pocket_
-"...we'll be waiting for them."
-
----
-
-_Technical Notes:_
-
-- Exploit: CVE-2023-46214 (Splunk Enterprise RCE)
-- Attack Chain: Authentication → Upload → Code Execution
-- Persistence Mechanisms: Account Creation, SSH Key Installation
-- MITRE Techniques: T1136, T1203, T1098
--
 
 ## Episode 4: The Time Paradox
 
