@@ -201,30 +201,30 @@ But we also need to access the 7th character (index 6) which is beyond our passw
 
 Let's solve the password constraints we know:
 
-input_passwd[0] = input_passwd[5] (first and last char must be same)
-input_passwd[0] = input_passwd[3] + 1
-input_passwd[1] = input_passwd[0] + 1
-input_passwd[5] = input_passwd[2] + 4
-input_passwd[2] = input_passwd[4] + 2
+- input_passwd[0] = input_passwd[5] (first and last char must be same)
+- input_passwd[0] = input_passwd[3] + 1
+- input_passwd[1] = input_passwd[0] + 1
+- input_passwd[5] = input_passwd[2] + 4
+- input_passwd[2] = input_passwd[4] + 2
 
 The final test equation is:
 cCopytest = 5 + (input_passwd[3] ^ 'r') + input_passwd[6] = 0
 
 Exploitation approach:
 
-We can craft a 6-character password that satisfies the character relationships
+_We can craft a 6-character password that satisfies the character relationships
 Then, by adding a 7th character (which technically shouldn't be allowed), we can control input_passwd[6]
-The program will first check length (6 chars) but then still access the 7th byte in memory
+The program will first check length (6 chars) but then still access the 7th byte in memory_
 
 Let's solve this:
 
-Let's say input_passwd[3] = 'r' so the XOR equals 0
-Then input_passwd[0] = 's' (because [0] = [3] + 1)
-input_passwd[1] = 't' (because [1] = [0] + 1)
-Let's make input_passwd[4] = 'p'
-Then input_passwd[2] = 'r' (because [2] = [4] + 2)
-input_passwd[5] = 'v' (because [5] = [2] + 4)
-Finally input_passwd[6] = -5 (to make final equation = 0)
+- Let's say input_passwd[3] = 'r' so the XOR equals 0
+- Then input_passwd[0] = 's' (because [0] = [3] + 1)
+- input_passwd[1] = 't' (because [1] = [0] + 1)
+- Let's make input_passwd[4] = 'p'
+- Then input_passwd[2] = 'r' (because [2] = [4] + 2)
+- input_passwd[5] = 'v' (because [5] = [2] + 4)
+- Finally input_passwd[6] = -5 (to make final equation = 0)
 
 Therefore, a working exploit would be:
 
