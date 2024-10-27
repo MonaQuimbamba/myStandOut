@@ -7,7 +7,7 @@ tags: ["x86-64", "ARM"]
 series: "Assembly"
 ---
 
-- Reading time : "11 min"
+- Reading time : "8 min"
 
 # The Digital Storm Chronicles
 
