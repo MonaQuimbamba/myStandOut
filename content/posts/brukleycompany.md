@@ -57,6 +57,8 @@ _His finger traces across the screen, pointing to a username that shouldn't exis
 **John**:  
 "How did we miss this?"
 
+**Thomas**: "It seems someone may have gained unauthorized access to John's credentials."
+
 ---
 
 ### Scene 5: The Response
@@ -126,7 +128,7 @@ _Monaquimbamba's fingers dance across her mechanical keyboard, the clicking soun
 **Monaquimbamba** [muttering to herself]:  
 "Let's see what stories these packets can tell..."
 
-_She types her first filter command:_
+_She types her first filter command on **wireshark**:_
 
 ```wireshark
 http || https
@@ -898,6 +900,6 @@ _Her screen fills with hexadecimal values._
 "Let's see"
 
 **John**:  
-"Is this my file!! do they have it , now ???"
+"Oh no! They managed to exfiltrate the secret file from the President's confidential project!"
 
 ![Alt text](/images/file_fragility.png "Optional Title")
