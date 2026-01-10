@@ -11,7 +11,7 @@ series: "Hunting the hunter"
 
 # GETI City Cyber Crisis
 
-## Episode 1: The Breach
+## Episode 01: The Breach
 
 ---
 
