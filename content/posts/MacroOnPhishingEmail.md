@@ -4,7 +4,7 @@ date: 2026-01-10T13:43:53-06:00
 draft: false
 image: brand_image.jpg
 tags: ["AnyRun", "MacroVBS"]
-series: "Hunting the hunter"
+series: "Forensics"
 ---
 
 - Reading time : "16 min"
