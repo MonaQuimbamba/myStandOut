@@ -1,5 +1,5 @@
 ---
-title: "Hunting Phishing Email"
+title: "Macro on Phishing Email"
 date: 2026-01-10T13:43:53-06:00
 draft: false
 image: brand_image.jpg
