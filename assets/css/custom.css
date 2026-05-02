@@ -1,0 +1,33 @@
+/* Site overrides — appended after Poison’s bundle (same filename shadows theme empty file). */
+
+/* Gentler scaling than Poole’s 16px → 20px jump; keeps body text readable on phones & desktops */
+html {
+  font-size: clamp(16px, 2.6vw, 18px);
+}
+
+@media (min-width: 38em) {
+  html {
+    font-size: clamp(17px, 1.1vw + 15px, 20px);
+  }
+}
+
+body {
+  line-height: 1.65;
+}
+
+/* Comfortable line length for long technical posts */
+.container.content .post,
+.container.content .posts article.post,
+.container.content h1.title + ul.entries {
+  max-width: 65ch;
+}
+
+.container.content pre {
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+
+.content .post h2,
+.content .post h3 {
+  margin-top: 1.75em;
+}
