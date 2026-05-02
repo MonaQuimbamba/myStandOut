@@ -1,0 +1,12 @@
+# Netlify installs Hugo only when HUGO_VERSION is set:
+# https://docs.netlify.com/build/frameworks/framework-setup-guides/hugo/
+
+[build]
+  command = "hugo --gc --minify"
+  publish = "public"
+
+[build.environment]
+  # Match your local build: run `hugo version` and paste the same release here (no "extended" suffix).
+  HUGO_VERSION = "0.136.5"
+  # Poison theme lives in themes/poison as a git submodule — fetch it during build.
+  GIT_SUBMODULE_STRATEGY = "recursive"
