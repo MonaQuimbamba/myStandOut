@@ -2,6 +2,9 @@ baseURL = "/"
 languageCode = "en-us"
 theme = "poison"
 
+# Include posts dated slightly ahead of UTC (Netlify builds use UTC).
+buildFuture = true
+
 # Hugo >= 0.128 (replaces deprecated root-level paginate)
 [pagination]
 pagerSize = 10
@@ -32,7 +35,7 @@ pluralizelisttitles = false   # removes the automatically appended "s" on sideba
         # Limit:        If the files should be listed, how many should be shown.
     menu = [
         {Name = "Whoami", URL = "/about/", HasChildren = false},
-        {Name = "Posts", URL = "/posts/", Pre = "Recent", HasChildren = true, Limit = 5},
+        {Name = "Posts", URL = "/posts/", Pre = "Recent", HasChildren = true, Limit = 15},
         
         #{Name = "Projects", URL = "/projects/",HasChildren = false},
     ]

@@ -1,6 +1,6 @@
 ---
 title: "Web server breached"
-date: 2026-05-02T20:43:53-06:00
+date: 2026-05-02
 draft: false
 image: brand_image.jpg
 tags: ["Volatility", "Kape"]
