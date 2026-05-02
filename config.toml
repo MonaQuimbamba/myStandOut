@@ -1,12 +1,18 @@
 baseURL = "/"
 languageCode = "en-us"
 theme = "poison"
-paginate = 10
-disqusShortname = "" #"claudio-a"
+
+# Hugo >= 0.128 (replaces deprecated root-level paginate)
+[pagination]
+pagerSize = 10
+
 pluralizelisttitles = false   # removes the automatically appended "s" on sidebar entries
 
-# NOTE: If using Disqus as commenting engine, uncomment and configure this line
-# disqusShortname = "yourDisqusShortname"
+# Disqus (Hugo >= 0.120): use services, not root disqusShortname.
+# Uncomment when you want comments:
+# [services]
+#   [services.disqus]
+#     shortname = "yourDisqusShortname"
 
 [params]
     brand = "Claudio-a"                      # name of your site - appears in the sidebar
