@@ -2,6 +2,10 @@ baseURL = "/"
 languageCode = "en-us"
 theme = "poison"
 
+# Allow raw HTML in Markdown (e.g. embeds). Prefer trusted content only.
+[markup.goldmark.renderer]
+unsafe = true
+
 # Include posts dated slightly ahead of UTC (Netlify builds use UTC).
 buildFuture = true
 

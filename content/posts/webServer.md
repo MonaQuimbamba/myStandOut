@@ -82,11 +82,7 @@ GET /dvwa/vulnerabilities/fi/?page=../../../../../../../../users/administrator/d
 GET /dvwa/vulnerabilities/sqli/?id=2&Submit=Submit&Btta=5769 AND 1=1 UNION ALL SELECT 1,2,3,table_name FROM information_schema.tables WHERE 2>1-- ../../../etc/passwd HTTP/1.1
 ```
 
-<!-- Replace YOUR_ID with your YouTube video id. -->
-
-<a href="https://www.youtube.com/watch?v=QCCTmnMkRuI">
-  <img src="https://img.youtube.com/vi/QCCTmnMkRuI/0.jpg" width="600"/>
-</a>
+{{< youtube QCCTmnMkRuI >}}
 
 ## Memory analysis
 
@@ -140,6 +136,4 @@ Cmd #16 @ 0xe91380: netsh firewall set service type=remotedesktop mode=enable
 
 Together, disk logs and memory tell a short story: noisy web exploitation, possible log cleanup at the application layer, then host-level account and firewall changes consistent with maintaining access beyond the initial PHP/SQLi path.
 
-<a href="https://www.youtube.com/watch?v=JA2hN3wiyeU">
-  <img src="https://img.youtube.com/vi/JA2hN3wiyeU/0.jpg" width="600"/>
-</a>
+{{< youtube JA2hN3wiyeU >}}
