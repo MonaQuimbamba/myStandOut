@@ -1,18 +1,27 @@
-/* Site overrides — appended after Poison’s bundle (same filename shadows theme empty file). */
+/* Site overrides — appended after Poison's bundle (same filename shadows theme empty file). */
 
-/* Gentler scaling than Poole’s 16px → 20px jump; keeps body text readable on phones & desktops */
+/* Root size — mobile first, capped at 16px on desktop */
 html {
-  font-size: clamp(16px, 2.6vw, 18px);
+  font-size: clamp(14px, 2vw, 15px);
 }
 
 @media (min-width: 38em) {
   html {
-    font-size: clamp(17px, 1.1vw + 15px, 20px);
+    font-size: clamp(15px, 0.9vw + 13px, 16px);
   }
 }
 
 body {
-  line-height: 1.65;
+  line-height: 1.6;
+}
+
+/* Article body text — slightly smaller than UI chrome */
+.container.content .post p,
+.container.content .post li,
+.container.content .post td,
+.container.content .post blockquote {
+  font-size: 0.95rem;
+  line-height: 1.7;
 }
 
 /* Comfortable line length for long technical posts */
