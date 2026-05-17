@@ -1,5 +1,5 @@
 ﻿---
-title: "Booking.com ClickFix Phishing Campaign Delivering NetSupport RAT"
+title: "ClickFix Campaign Delivering NetSupport RAT"
 date: 2026-05-17
 draft: false
 image: brand_image.jpg
@@ -9,7 +9,7 @@ series: "DFIR"
 
 - Reading time : "10 min"
 
-# Booking.com ClickFix Phishing Campaign Delivering NetSupport RAT
+# ClickFix Campaign Delivering NetSupport RAT
 
 A multi-stage attack chain leveraging fake property review portals, ClickFix social engineering, and a custom MSI dropper to establish persistent remote access via NetSupport Manager.
 
