@@ -14,8 +14,6 @@ _--- Sun Tzu's "The Art of War"_
 
 **Hi there 👋**
 
-I'm Claudio, a passionate cybersecurity focused on CTF challenges and malware hunting.
-
 🔐 I work on uncovering vulnerabilities, analyzing malicious software, and developing strategies to strengthen security defenses. My projects range from threat detection to incident response, and I'm dedicated to staying ahead of the latest cyber threats and trends.
 
 🧰 I enjoy diving into digital forensics, reverse engineering, and network security analysis, always with an eye for innovation and collaboration.
