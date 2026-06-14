@@ -1,0 +1,109 @@
+<div class="article-toc {{if .Site.Params.layoutReverse}}layout-reverse{{end}}">
+    <div class="toc-wrapper" id="toc-wrapper">
+      <div class="toc-drag-handle" id="toc-handle" title="Drag to move">
+        <span class="toc-grip" aria-hidden="true">⠿</span>
+        <h4 id="contents"></h4>
+        <button type="button" class="toc-reset" id="toc-reset" title="Reset position" aria-label="Reset table of contents position">⟲</button>
+      </div>
+      {{ .TableOfContents }}
+    </div>
+</div>
+
+<script>
+(function () {
+    var STORAGE_KEY = "tocPosition";
+
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    function init() {
+        var wrapper = document.getElementById("toc-wrapper");
+        var handle = document.getElementById("toc-handle");
+        var resetBtn = document.getElementById("toc-reset");
+        if (!wrapper || !handle) { return; }
+
+        // Apply a saved position (kept inside the viewport).
+        function applySaved() {
+            var raw;
+            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { raw = null; }
+            if (!raw) { return; }
+            var pos;
+            try { pos = JSON.parse(raw); } catch (e) { return; }
+            if (!pos || typeof pos.left !== "number" || typeof pos.top !== "number") { return; }
+            var maxLeft = window.innerWidth - wrapper.offsetWidth;
+            var maxTop = window.innerHeight - wrapper.offsetHeight;
+            wrapper.style.left = clamp(pos.left, 0, Math.max(0, maxLeft)) + "px";
+            wrapper.style.top = clamp(pos.top, 0, Math.max(0, maxTop)) + "px";
+            wrapper.style.right = "auto";
+            wrapper.style.bottom = "auto";
+            wrapper.classList.add("toc-moved");
+        }
+
+        var dragging = false;
+        var startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+        function onPointerDown(e) {
+            // Ignore clicks on the reset button or on TOC links.
+            if (e.target.closest(".toc-reset")) { return; }
+            var rect = wrapper.getBoundingClientRect();
+            dragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = rect.left;
+            startTop = rect.top;
+            wrapper.classList.add("dragging", "toc-moved");
+            handle.setPointerCapture && handle.setPointerCapture(e.pointerId);
+            e.preventDefault();
+        }
+
+        function onPointerMove(e) {
+            if (!dragging) { return; }
+            var maxLeft = window.innerWidth - wrapper.offsetWidth;
+            var maxTop = window.innerHeight - wrapper.offsetHeight;
+            var newLeft = clamp(startLeft + (e.clientX - startX), 0, Math.max(0, maxLeft));
+            var newTop = clamp(startTop + (e.clientY - startY), 0, Math.max(0, maxTop));
+            wrapper.style.left = newLeft + "px";
+            wrapper.style.top = newTop + "px";
+            wrapper.style.right = "auto";
+            wrapper.style.bottom = "auto";
+        }
+
+        function onPointerUp() {
+            if (!dragging) { return; }
+            dragging = false;
+            wrapper.classList.remove("dragging");
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    left: parseInt(wrapper.style.left, 10) || 0,
+                    top: parseInt(wrapper.style.top, 10) || 0
+                }));
+            } catch (e) { /* storage unavailable */ }
+        }
+
+        function resetPosition() {
+            wrapper.style.left = "";
+            wrapper.style.top = "";
+            wrapper.style.right = "";
+            wrapper.style.bottom = "";
+            wrapper.classList.remove("toc-moved");
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+        }
+
+        handle.addEventListener("pointerdown", onPointerDown);
+        window.addEventListener("pointermove", onPointerMove);
+        window.addEventListener("pointerup", onPointerUp);
+        if (resetBtn) {
+            resetBtn.addEventListener("click", resetPosition);
+        }
+
+        applySaved();
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+})();
+</script>

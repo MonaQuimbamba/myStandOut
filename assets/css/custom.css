@@ -1,42 +1,66 @@
-/* Site overrides — appended after Poison's bundle (same filename shadows theme empty file). */
+/* ── Draggable Table of Contents ─────────────────────────────── */
 
-/* Root size — mobile first, capped at 16px on desktop */
-html {
-  font-size: clamp(14px, 2vw, 15px);
+/* Make the floating TOC look like a movable panel */
+.article-toc .toc-wrapper {
+    padding: 0.5em 0.9em 0.75em 0.9em;
+    border: 1px solid var(--table-border-color);
+    border-radius: 0.5em;
+    background-color: var(--sidebar-bg-color);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    max-width: 20em;
+    z-index: 50;
 }
 
-@media (min-width: 38em) {
-  html {
-    font-size: clamp(15px, 0.9vw + 13px, 16px);
-  }
+/* Once the user has dragged it, keep it pinned to the viewport */
+.article-toc .toc-wrapper.toc-moved {
+    position: fixed;
+    margin-top: 0;
 }
 
-body {
-  line-height: 1.6;
+/* Header acts as the drag handle */
+.toc-drag-handle {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    cursor: move;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    margin-bottom: 0.25em;
 }
 
-/* Article body text — slightly smaller than UI chrome */
-.container.content .post p,
-.container.content .post li,
-.container.content .post td,
-.container.content .post blockquote {
-  font-size: 0.95rem;
-  line-height: 1.7;
+.toc-wrapper.dragging .toc-drag-handle {
+    cursor: grabbing;
 }
 
-/* Comfortable line length for long technical posts */
-.container.content .post,
-.container.content .posts article.post,
-.container.content h1.title + ul.entries {
-  max-width: 65ch;
+.toc-wrapper.dragging {
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-.container.content pre {
-  font-size: 0.88em;
-  line-height: 1.45;
+.toc-drag-handle h4 {
+    margin: 0 !important;
+    flex-grow: 1;
 }
 
-.content .post h2,
-.content .post h3 {
-  margin-top: 1.75em;
+.toc-grip {
+    color: var(--sidebar-p-color);
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+.toc-reset {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: var(--sidebar-p-color);
+    font-size: 1.05em;
+    line-height: 1;
+    padding: 0.1em 0.3em;
+    border-radius: 0.3em;
+}
+
+.toc-reset:hover {
+    color: var(--text-color);
+    background-color: var(--table-stripe-color);
 }
