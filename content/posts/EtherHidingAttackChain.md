@@ -8,7 +8,7 @@ tags: ["AnyRun", "ClickFix",  "Phishing","EtherHiding"]
 series: "DFIR"
 ---
 
-- Reading time : "10 min"
+- Reading time : "13 min"
 
 # ClickFix Phishing Campaign with EtherHiding
 
