@@ -83,7 +83,7 @@ The BSC node responds with a JSON-RPC result containing the ABI-encoded payload:
 
 The result field is ABI-encoded as a Solidity string type. The loader skips the 64-byte ABI prefix (offset + length fields), then base64-decodes the remaining 2,012 bytes to recover the Stage 2 JavaScript.
 
-Tool to decode it [CyverChef](https://gchq.github.io/CyberChef/).
+Tool to decode it [CyberChef](https://gchq.github.io/CyberChef/).
 
 
 ### Stage 2 — Evasion + Bot Filtering
@@ -181,7 +181,7 @@ The malicious PowerShell command silently written to the victim's clipboard:
 
 ![The CAPTCHA decoded payload ](/images/etherclickFake.png "The CAPTCHA decoded payload")
 
-Tool to decode it [CyverChef](https://webcrack.netlify.app/).
+Tool to decode it [WebCrack](https://webcrack.netlify.app/).
 
 
 ```json
